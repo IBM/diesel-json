@@ -1,0 +1,9 @@
+{
+  "name": "diesel-json-schema-parent",
+  "version": "1.0.0",
+  "private": true,
+  "workspaces": [
+    "js-facade",
+    "ts-facade"
+  ]
+}

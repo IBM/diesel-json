@@ -1,0 +1,37 @@
+{
+  "name": "@diesel/json-schema-facade-ts",
+  "version": "0.1.0",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "dependencies": {
+    "@diesel/json-schema-facade-js": "^0.1.0"
+  },
+  "peerDependencies": {
+  },
+  "devDependencies": {
+    "@types/jest": "^26.0.20",
+    "eslint-config-prettier": "^6.11.0",
+    "eslint-plugin-prettier": "^3.1.4",
+    "jest": "24.9.0",
+    "npm-scripts-watcher": "^1.0.2",
+    "prettier": "2.0.5",
+    "ts-jest": "24.0.2",
+    "typescript": "~3.8.0"
+  },
+  "scripts": {
+    "build": "yarn clean && yarn build:ts",
+    "build:ts": "tsc",
+    "clean": "rimraf dist",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "watch": "npm-scripts-watcher",
+    "prettify": "prettier --write .",
+    "lint": "eslint '**/*.{js,ts,tsx}'",
+    "lint:fix": "eslint '**/*.{js,ts,tsx}' --fix"
+  },
+  "watch": {
+    "src/**/!(*.test|*.spec).{ts,tsx}": [
+      "build:ts"
+    ]
+  }
+}
