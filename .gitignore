@@ -1,0 +1,17 @@
+target/
+node_modules/
+
+.idea/
+*.iml
+.vscode/
+# vscode generated files
+ensime-langserver.log
+pc.stdout.log
+.bloop/
+.metals/
+.bsp
+metals.sbt
+
+src_managed/
+
+*gpcreds.json
