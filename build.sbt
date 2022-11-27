@@ -12,11 +12,12 @@ lazy val copyrightSettings = Seq(
 )
 
 addCommandAlias("lint", "fmtCheck;fixCheck;headerCheckAll")
-addCommandAlias("build", "compile;fastOptJS")
+addCommandAlias("build", "compile;fastOptJS;yarnAll")
 addCommandAlias("fmtCheck", "all scalafmtSbtCheck scalafmtCheckAll")
 addCommandAlias("fixCheck", "scalafixAll --check")
 addCommandAlias("fmt", "all scalafmtSbt scalafmtAll")
 addCommandAlias("lintFix", "headerCreateAll;scalafixAll;fmt")
+addCommandAlias("yarnAll", "yarnInstall;yarnBuild")
 
 inThisBuild(
   List(
@@ -34,6 +35,9 @@ lazy val root: Project = project
     name := "diesel-json-schema-root",
     scalaVersion := scalaVersion_
     // publish / skip := true
+  )
+  .settings(
+    yarnInstall := "yarn install".!
   )
 
 ThisBuild / evictionErrorLevel := Level.Warn
@@ -83,7 +87,7 @@ lazy val diesel = crossProject(JSPlatform, JVMPlatform)
 lazy val jsFacade = project
   .in(file("js-facade"))
   .dependsOn(dieselJS)
-  .settings(copyrightSettings)
+  .settings(copyrightSettingsTS)
   .settings(
     libraryDependencies ++= Seq(
       "org.scalameta" %%% "munit" % "0.7.29" % Test
@@ -91,6 +95,59 @@ lazy val jsFacade = project
     // see https://github.com/scalameta/munit/blob/main/junit-interface/src/main/java/munit/internal/junitinterface/JUnitRunner.java
     Test / testOptions += Tests.Argument("+l", "--summary=1")
   )
+  .settings(
+    yarnPack := {
+      scalajsbundler.Yarn.run("pack")(baseDirectory.value, streams.value.log)
+    },
+    yarnPublish := {
+      scalajsbundler.Yarn.run("publish", "--no-git-tag-version")(baseDirectory.value, streams.value.log)
+    }
+  )
+
+import sbt.Keys.streams
+lazy val copyrightSettingsTS = Seq(
+  headerMappings := headerMappings.value + (HeaderFileType("ts") -> HeaderCommentStyle.cStyleBlockComment),
+  Compile / headerSources ++= {
+    fileTreeView.value.list(
+      Glob(baseDirectory.value.toPath) / "{src,test}" / ** / "*.{ts*,*css}"
+    ).map(
+      _._1.toFile
+    )
+  }
+)
+
+lazy val yarnInstall = taskKey[Unit]("yarn install")
+lazy val yarnBuild   = taskKey[Unit]("yarn build")
+lazy val yarnLint    = taskKey[Unit]("yarn lint")
+lazy val yarnLintFix = taskKey[Unit]("yarn lint:fix")
+lazy val yarnPublish = taskKey[Unit]("yarn publish")
+lazy val yarnPack    = taskKey[Unit]("yarn pack")
+
+// lazy val tsFacade = project
+//   .in(file("ts-facade"))
+//   .settings(copyrightSettingsTS)
+//   .settings(
+//       cleanFiles += baseDirectory.value / "dist"
+//     )
+//   .settings(
+//     yarnBuild := {
+//       scalajsbundler.Yarn.run("build")(baseDirectory.value, streams.value.log)
+//     },
+//     yarnLint := {
+//       scalajsbundler.Yarn.run("lint")(baseDirectory.value, streams.value.log)
+//     },
+//     yarnLintFix := {
+//       scalajsbundler.Yarn.run("lint:fix")(baseDirectory.value, streams.value.log)
+//     },
+//     yarnPack := {
+//       val dep = yarnBuild.value
+//       scalajsbundler.Yarn.run("pack")(baseDirectory.value, streams.value.log)
+//     },
+//     yarnPublish := {
+//       val dep = yarnBuild.value
+//       scalajsbundler.Yarn.run("publish", "--no-git-tag-version")(baseDirectory.value, streams.value.log)
+//     }
+//   )
 
 lazy val dieselJS  = diesel.js
 lazy val dieselJVM = diesel.jvm

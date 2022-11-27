@@ -1,0 +1,19 @@
+language: scala
+
+scala:
+  - 2.13.8
+
+cache:
+  directories:
+    - $HOME/.sbt
+    - $HOME/.ivy2/cache
+    - $HOME/.m2/repository # not needed?
+
+jdk:
+  - openjdk8
+
+install:
+  - nvm use 12
+
+script:
+  - sbt build lint test
