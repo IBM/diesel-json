@@ -1,5 +1,5 @@
 {
-  "name": "diesel-json-schema-parent",
+  "name": "@diesel-parser/json-schema-parent",
   "version": "0.2.0",
   "private": true,
   "workspaces": [

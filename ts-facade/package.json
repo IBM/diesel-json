@@ -1,5 +1,5 @@
 {
-  "name": "diesel-json-schema-facade-ts",
+  "name": "@diesel-parser/json-schema-facade-ts",
   "version": "0.3.0",
   "description": "JS facade for diesel JSON Schema",
   "author": "Rémi Van Keisbelck <remi@rvkb.com>",
@@ -14,7 +14,7 @@
     "access": "public"
   },
   "dependencies": {
-    "diesel-json-schema-facade-js": "^0.3.0"
+    "@diesel-parser/json-schema-facade-js": "^0.3.0"
   },
   "devDependencies": {
     "@types/jest": "^26.0.20",
