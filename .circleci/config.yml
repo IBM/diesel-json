@@ -11,9 +11,7 @@ jobs:
 
     steps:
       - checkout
-      - run curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.38.0/install.sh | bash
-      - run source ~/.bashrc
-      - run nvm install v18.12.1
+      - run sudo apt install curl 
       - run: ./build-sbt.sh
       - persist_to_workspace:
           root: ~/repo
