@@ -1,4 +1,4 @@
 cd ./js-facade &&     \
-yarn publish &&  \
+yarn publish --access public &&  \
 cd ../ts-facade && \
-yarn publish
+yarn publish --access public
