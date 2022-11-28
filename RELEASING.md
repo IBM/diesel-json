@@ -58,8 +58,8 @@ Take a look ...
 
 Release in github (requires your github token `export GREN_GITHUB_TOKEN=...`)
 
-    gren release
-    gren changelog --generate
+    yarn release:gh
+    yarn release:changelog
 
 Unbump `develop` and update changelog
 
