@@ -1,6 +1,13 @@
 {
   "name": "@diesel/json-schema-facade-ts",
   "version": "0.1.0",
+  "description": "JS facade for diesel JSON Schema",
+  "author": "Rémi Van Keisbelck <remi@rvkb.com>",  
+  "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:IBM/diesel-json-schema"
+  },
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "dependencies": {
