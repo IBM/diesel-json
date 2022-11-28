@@ -12,9 +12,9 @@ jobs:
     steps:
       - checkout
       - run: sudo apt install curl 
-      - run: curl https://raw.githubusercontent.com/creationix/nvm/master/install.sh | bash 
-      - run: source ~/.bashrc
-      - run: nvm install --lts
+      - run: curl -fsSL https://deb.nodesource.com/setup_lts.x
+      - run: sudo apt-get install -y nodejs
+      - run: node -v
       - run: ./build-sbt.sh
       - persist_to_workspace:
           root: ~/repo
