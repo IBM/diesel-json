@@ -19,11 +19,11 @@ jobs:
       - run: node -v
       - run: sudo npm install --global yarn
       - run: ./build.sh
-       - save_cache:
-          key: sbt-cache
-          paths:
-            - "~/.ivy2/cache"
-            - "~/.sbt"
+      - save_cache:
+        key: sbt-cache
+        paths:
+          - "~/.ivy2/cache"
+          - "~/.sbt"
       - persist_to_workspace:
           root: ~/repo
           paths: .
