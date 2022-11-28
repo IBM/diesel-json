@@ -17,6 +17,6 @@ withJsonFile("./js-facade/package.json", j => {
 
 withJsonFile("./ts-facade/package.json", j => {
     j.version = VERSION;
-    j.dependencies['@diesel/json-schema-facade-js'] = '^' + VERSION;
+    j.dependencies['@diesel-parser/json-schema-facade-js'] = '^' + VERSION;
 });
 

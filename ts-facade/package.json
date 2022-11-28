@@ -14,8 +14,7 @@
     "access": "public"
   },
   "dependencies": {
-    "@diesel-parser/json-schema-facade-js": "^0.3.0",
-    "@diesel/json-schema-facade-js": "^0.4.0"
+    "@diesel-parser/json-schema-facade-js": "^0.4.0"
   },
   "devDependencies": {
     "@types/jest": "^26.0.20",
