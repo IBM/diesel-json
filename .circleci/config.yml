@@ -8,4 +8,4 @@ jobs:
     steps:
       - checkout
       - circleci/use-openjdk8
-      - run: sbt test
+      - run: ./build-sbt.sh
