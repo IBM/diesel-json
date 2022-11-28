@@ -11,12 +11,19 @@ jobs:
 
     steps:
       - checkout
+      - restore_cache:
+        key: sbt-cache
       - run: sudo apt-get install curl 
       - run: curl -fsSL https://deb.nodesource.com/setup_lts.x  | sudo -E bash -
       - run: sudo apt-get install -y nodejs
       - run: node -v
       - run: sudo npm install --global yarn
       - run: ./build.sh
+       - save_cache:
+          key: sbt-cache
+          paths:
+            - "~/.ivy2/cache"
+            - "~/.sbt"
       - persist_to_workspace:
           root: ~/repo
           paths: .
