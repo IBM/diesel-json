@@ -25,7 +25,7 @@ GREN
 
 Print current version(s)
 
-    git fetch origin master develop
+    git fetch origin main develop
     git describe
 
 New release version
