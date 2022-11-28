@@ -1,0 +1,11 @@
+version: 2.1
+orbs:
+  circleci: leoilab/circleci@1.0.0
+jobs:
+  build:
+    machine:
+      image: 'ubuntu-1604:201903-01'
+    steps:
+      - checkout
+      - circleci/use-openjdk8
+      - run: sbt test

@@ -19,7 +19,7 @@
     "typescript": "~3.8.0"
   },
   "scripts": {
-    "build": "yarn clean && yarn build:ts",
+    "build": "yarn clean && yarn build:ts && yarn test",
     "build:ts": "tsc",
     "clean": "rimraf dist",
     "test": "jest",

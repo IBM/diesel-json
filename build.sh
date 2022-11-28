@@ -1,4 +1,3 @@
 #!/bin/bash
 
-# build sbt
-sbt build lint test
+./build-sbt.sh
