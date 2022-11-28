@@ -11,7 +11,10 @@ jobs:
 
     steps:
       - checkout
-      - run sudo apt install curl 
+      - run: sudo apt install curl 
+      - run: curl https://raw.githubusercontent.com/creationix/nvm/master/install.sh | bash 
+      - run: source ~/.bashrc
+      - run: nvm install --lts
       - run: ./build-sbt.sh
       - persist_to_workspace:
           root: ~/repo
