@@ -5,5 +5,12 @@
   "workspaces": [
     "js-facade",
     "ts-facade"
-  ]
+  ],
+  "devDependencies": {
+    "github-release-notes": "0.17.2"
+  },
+  "scripts": {
+    "release:gh": "gren release",
+    "release:changelog": "gren changelog --tags all --generate --override"
+  }
 }
