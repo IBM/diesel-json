@@ -1,3 +1,5 @@
+[![CircleCI](https://dl.circleci.com/status-badge/img/gh/IBM/diesel-json/tree/develop.svg?style=svg)](https://dl.circleci.com/status-badge/redirect/gh/IBM/diesel-json/tree/develop)
+
 # diesel-json
 
 This repo contains :
