@@ -41,8 +41,6 @@ New release version
     
     
     node ./bump-version.js
-    
-    ./bump-version-release.sh $VERSION || echo 'KO!'
     git diff
 
 Take a look ...
