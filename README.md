@@ -1,5 +1,10 @@
 [![CircleCI](https://dl.circleci.com/status-badge/img/gh/IBM/diesel-json/tree/develop.svg?style=svg)](https://dl.circleci.com/status-badge/redirect/gh/IBM/diesel-json/tree/develop)
 
+[![npm version](https://badge.fury.io/js/@diesel-parser%2Fjson-schema-facade-js.svg)](https://badge.fury.io/js/@diesel-parser%2Fjson-schema-facade-js)
+
+[![npm version](https://badge.fury.io/js/@diesel-parser%2Fjson-schema-facade-ts.svg)](https://badge.fury.io/js/@diesel-parser%2Fjson-schema-facade-ts)
+
+
 # diesel-json
 
 This repo contains :
