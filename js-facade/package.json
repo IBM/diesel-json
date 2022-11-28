@@ -8,5 +8,8 @@
     "type": "git",
     "url": "git@github.com:IBM/diesel-json-schema"
   },
-  "main": "dist/json-schema-facade.js"
+  "main": "dist/json-schema-facade.js",
+  "publishConfig": {
+    "access": "public"
+  }
 }
