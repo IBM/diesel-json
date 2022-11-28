@@ -8,7 +8,7 @@
  */
 
 // @ts-ignore
-import { JsonSchemaJsFacade } from '@diesel/json-schema-facade-js';
+import { JsonSchemaJsFacade } from 'diesel-json-schema-facade-js';
 
 export interface JsValidationError {
   readonly path: string;
