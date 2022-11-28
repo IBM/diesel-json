@@ -7,7 +7,7 @@
  * irrespective of what has been deposited with the U.S Copyright Office.
  */
 
-import { validate, getErrors, JsValidationError, propose } from './JsFacade';
+import { validate, getErrors, JsValidationError, propose } from './index';
 
 function withErrors(
   schema: any,
