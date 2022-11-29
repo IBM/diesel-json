@@ -173,11 +173,11 @@ class JsonSchemaJsFacadeTest extends FunSuite {
   }
 
   test("parsing should return validation errors") {
-    val schema = js.Dynamic.literal(
-      "type" -> "string",
+    val schema     = js.Dynamic.literal(
+      "type" -> "string"
     )
     val jsonParser = JsonSchemaJsFacade.getJsonParser(schema)
-    val res = jsonParser.parse(DieselParsers.createParseRequest("true"))
+    val res        = jsonParser.parse(DieselParsers.createParseRequest("true"))
     assert(res.success)
     assert(res.error.isEmpty)
     assertEquals(res.styles.length, 1)
