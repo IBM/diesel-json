@@ -16,6 +16,7 @@
 
 package diesel.json.jsonschema
 
+import diesel.facade.DieselParsers
 import diesel.json.jsonschema.facade.JsonSchemaJsFacade
 import munit.FunSuite
 
@@ -169,6 +170,21 @@ class JsonSchemaJsFacadeTest extends FunSuite {
     assertEquals(I18n.nothingValidates(), "无任何验证")
     JsonSchemaJsFacade.setLang("zh-TW")
     assertEquals(I18n.nothingValidates(), "未驗證任何內容")
+  }
+
+  test("parsing should return validation errors") {
+    val schema     = js.Dynamic.literal(
+      "type" -> "string"
+    )
+    val jsonParser = JsonSchemaJsFacade.getJsonParser(schema)
+    val res        = jsonParser.parse(DieselParsers.createParseRequest("true"))
+    assert(res.success)
+    assert(res.error.isEmpty)
+    assertEquals(res.styles.length, 1)
+    assertEquals(res.markers.length, 1)
+    assertEquals(res.markers(0).offset, 0)
+    assertEquals(res.markers(0).length, 4)
+    assertEquals(res.markers(0).severity, "error")
   }
 
 }
