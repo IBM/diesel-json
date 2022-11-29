@@ -114,6 +114,20 @@ describe('parse', () => {
     expect(res.markers.length).toEqual(0);
     expect(res.styles.length).toEqual(0);
   });
+  test("parser should validate", () => {
+    const parseRequest = DieselParsers.createParseRequest("true");
+    const res = getJsonParser({
+      type: "string"
+    }).parse(parseRequest);
+    expect(res.error).toBeUndefined();
+    expect(res.success).toBe(true);
+    expect(res.markers.length).toEqual(1);
+    const m0 = res.markers[0];
+    expect(m0.offset).toBe(0);
+    expect(m0.length).toBe(4);
+    expect(m0.severity).toBe("error");
+    expect(m0.getMessage("en")).toBe("Invalid type: expected string")
+  });
   test("parser should predict", () => {
     const predictRequest = DieselParsers.createPredictRequest("", 0);
     const res = getJsonParser({}).predict(predictRequest);

@@ -16,7 +16,8 @@
 
 package diesel.json.jsonschema.facade
 
-import diesel.facade.DieselParserFacade
+import diesel.{GenericTree, Marker}
+import diesel.facade.{DieselParserFacade, MarkerPostProcessor}
 import diesel.json.{Ast, Json, JsonCompletion}
 import diesel.json.jsonschema.JsValue.{fromValue, toValue}
 import diesel.json.jsonschema._
@@ -29,12 +30,22 @@ import diesel.i18n.Lang
 @JSExportTopLevel("JsonSchemaJsFacade")
 object JsonSchemaJsFacade {
 
+  class JsonMarkerPostProcessor(private val schema: JsonSchema) extends MarkerPostProcessor {
+    override def postProcessMarkers(tree: GenericTree): Seq[Marker] = {
+      val existingMarkers = tree.markers
+      println("existing", existingMarkers)
+      val schemaMarkers = JsonSchema.postProcessMarkers(schema)(tree)
+      println("schema", schemaMarkers)
+      existingMarkers  ++ schemaMarkers
+    }
+  }
+
   @JSExport
   def getJsonParser(schema: Any): DieselParserFacade = {
     val s: Ast.Value            = toValue(schema)
     val schemaVal               = JsonSchema.parse(s, new JsonSchemaParserContext(s))
     val completionConfiguration = JsonCompletion.completionConfiguration(schemaVal)
-    new DieselParserFacade(Json, Some(completionConfiguration), None)
+    new DieselParserFacade(Json, Some(completionConfiguration), None, Some(new JsonMarkerPostProcessor(schemaVal)))
   }
 
   @JSExportAll
