@@ -16,7 +16,8 @@
 
 package diesel.json.jsonschema.facade
 
-import diesel.json.Ast
+import diesel.facade.DieselParserFacade
+import diesel.json.{Ast, Json, JsonCompletion}
 import diesel.json.jsonschema.JsValue.{fromValue, toValue}
 import diesel.json.jsonschema._
 
@@ -27,6 +28,14 @@ import diesel.i18n.Lang
 
 @JSExportTopLevel("JsonSchemaJsFacade")
 object JsonSchemaJsFacade {
+
+  @JSExport
+  def getJsonParser(schema: Any): DieselParserFacade = {
+    val s: Ast.Value            = toValue(schema)
+    val schemaVal               = JsonSchema.parse(s, new JsonSchemaParserContext(s))
+    val completionConfiguration = JsonCompletion.completionConfiguration(schemaVal)
+    new DieselParserFacade(Json, Some(completionConfiguration), None)
+  }
 
   @JSExportAll
   case class JsValidationError(path: String, message: String)

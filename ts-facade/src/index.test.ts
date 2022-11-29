@@ -7,7 +7,7 @@
  * irrespective of what has been deposited with the U.S Copyright Office.
  */
 
-import { validate, getErrors, JsValidationError, propose } from './index';
+import {validate, getErrors, JsValidationError, propose, getJsonParser, DieselParsers} from './index';
 
 function withErrors(
   schema: any,
@@ -98,5 +98,27 @@ describe('propose', () => {
       expect(proposals.length).toBe(1);
       expect(proposals[0]).toEqual({ foo: '', bar: 0 });
     });
+  });
+});
+
+describe('parse', () => {
+  test("parser should be defined", () => {
+    const p = getJsonParser({});
+    expect(p).toBeDefined();
+  });
+  test("parser should parse", () => {
+    const parseRequest = DieselParsers.createParseRequest("{}");
+    const res = getJsonParser({}).parse(parseRequest);
+    expect(res.error).toBeUndefined();
+    expect(res.success).toBe(true);
+    expect(res.markers.length).toEqual(0);
+    expect(res.styles.length).toEqual(0);
+  });
+  test("parser should predict", () => {
+    const predictRequest = DieselParsers.createPredictRequest("", 0);
+    const res = getJsonParser({}).predict(predictRequest);
+    expect(res.error).toBeUndefined();
+    expect(res.success).toBe(true);
+    expect(res.proposals.length).toEqual(7);
   });
 });
