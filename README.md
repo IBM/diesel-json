@@ -11,6 +11,8 @@ This repo contains :
 * an Scala implementation of JSON Schema
 * a diesel DSL for JSON, with Schema-based completion/validation
 
+[Sandbox](https://ibm.github.io/diesel-json-form/)
+
 ## Build
 
 See `build.sh`.

@@ -61,12 +61,8 @@ Release in github (requires your github token `export GREN_GITHUB_TOKEN=...`)
     yarn release:gh
     yarn release:changelog
 
-Unbump `develop` and update changelog
+ Update changelog and push develop
 
-    ./bump-version-latest-snapshot.sh
-    git diff
-
-    git commit -am "back to LAT-SNAP"
     git push origin develop
     
     git describe

@@ -54,16 +54,16 @@ class JsonCustomPredictionTest extends FunSuite {
     schema: String,
     text: String,
     offset: Int,
-    expectedPredictions: Seq[String]
+    expectedPredictions: Seq[String],
+    expectedReplacements: Option[Seq[Option[(Int, Int)]]] = None
   ): Unit = {
     val s         = JsonSchema.parse(schema).toOption.get._2
     val config    = JsonCompletion.completionConfiguration(s)
     val proposals = predict(Json, text, offset, Some(config))
-    assert(
-      proposals.map(_.text) == expectedPredictions
-    )
-    assert(
-      proposals.map(_.replace) == expectedPredictions.map(_ => None)
+    assertEquals(proposals.map(_.text), expectedPredictions)
+    assertEquals(
+      proposals.map(_.replace),
+      expectedReplacements.getOrElse(expectedPredictions.map(_ => None))
     )
   }
 
@@ -92,7 +92,8 @@ class JsonCustomPredictionTest extends FunSuite {
       customerSchema,
       "{ \"\"",
       3,
-      expectedObjectFirstLevel
+      expectedObjectFirstLevel,
+      Some(expectedObjectFirstLevel.map(_ => Some((2, 1))))
     )
   }
 
