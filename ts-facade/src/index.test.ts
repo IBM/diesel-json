@@ -1,13 +1,20 @@
 /*
- * IBM Confidential
- * OCO Source Materials
- * 5737-I23
- * Copyright IBM Corp. 2021
- * The source code for this program is not published or otherwise divested of its trade secrets,
- * irrespective of what has been deposited with the U.S Copyright Office.
+ * Copyright 2018 The Diesel Authors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
-import {validate, getErrors, JsValidationError, propose, getJsonParser, DieselParsers} from './index';
+import {validate, getErrors, JsValidationError, propose, getJsonParser } from './index';
 
 function withErrors(
   schema: any,
@@ -107,7 +114,7 @@ describe('parse', () => {
     expect(p).toBeDefined();
   });
   test("parser should parse", () => {
-    const parseRequest = DieselParsers.createParseRequest("{}");
+    const parseRequest = { text: "{}" };
     const res = getJsonParser({}).parse(parseRequest);
     expect(res.error).toBeUndefined();
     expect(res.success).toBe(true);
@@ -115,7 +122,7 @@ describe('parse', () => {
     expect(res.styles.length).toEqual(0);
   });
   test("parser should validate", () => {
-    const parseRequest = DieselParsers.createParseRequest("true");
+    const parseRequest = { text: "true" };
     const res = getJsonParser({
       type: "string"
     }).parse(parseRequest);
@@ -129,7 +136,7 @@ describe('parse', () => {
     expect(m0.getMessage("en")).toBe("Invalid type: expected string")
   });
   test("parser should predict", () => {
-    const predictRequest = DieselParsers.createPredictRequest("", 0);
+    const predictRequest = { text: "", offset: 0 };
     const res = getJsonParser({}).predict(predictRequest);
     expect(res.error).toBeUndefined();
     expect(res.success).toBe(true);

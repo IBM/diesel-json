@@ -16,7 +16,7 @@
 
 package diesel.json.jsonschema
 
-import diesel.facade.DieselParsers
+import diesel.facade.ParseRequest
 import diesel.json.jsonschema.facade.JsonSchemaJsFacade
 import munit.FunSuite
 
@@ -173,11 +173,12 @@ class JsonSchemaJsFacadeTest extends FunSuite {
   }
 
   test("parsing should return validation errors") {
-    val schema     = js.Dynamic.literal(
+    val schema       = js.Dynamic.literal(
       "type" -> "string"
     )
-    val jsonParser = JsonSchemaJsFacade.getJsonParser(schema)
-    val res        = jsonParser.parse(DieselParsers.createParseRequest("true"))
+    val jsonParser   = JsonSchemaJsFacade.getJsonParser(schema)
+    val parseRequest = js.Dynamic.literal("text" -> "true").asInstanceOf[ParseRequest]
+    val res          = jsonParser.parse(parseRequest)
     assert(res.success)
     assert(res.error.isEmpty)
     assertEquals(res.styles.length, 1)
