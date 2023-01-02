@@ -29,3 +29,4 @@ Then you can build the `ts-facade` and run its tests.
 Using the lib depends on the target. Scala users will probably use the Scala lib 
 directly, whereas TS (or JS) users will find it easier to depend on the npm modules.
 
+test
