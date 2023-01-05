@@ -14,4 +14,4 @@ metals.sbt
 
 src_managed/
 
-*gpcreds.json
+*gpcreds.json.git/
