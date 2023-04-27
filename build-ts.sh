@@ -1,3 +1,3 @@
 #!/bin/bash
 
-yarn install && yarn --cwd ./ts-facade build
+yarn install && yarn bomlint && yarn --cwd ./ts-facade build
