@@ -22,6 +22,8 @@ import diesel.json.jsonschema.{JPath, JsonSchema}
 
 object JsonCompletion {
 
+  val completionLookback: CompletionLookback = SimpleCompletionLookback("{}:,[]")
+
   def completionConfiguration(schema: JsonSchema): CompletionConfiguration = {
     val configuration = new CompletionConfiguration
     val valueProvider = new JsonValueProvider(schema)
@@ -30,6 +32,7 @@ object JsonCompletion {
     configuration.setProvider(DslSyntax(Json.attrValue), valueProvider)
     configuration.setProvider(DslSyntax(Json.sAxiom), valueProvider)
     configuration.setFilter(new JsonCompletionFilter(schema))
+    configuration.setLookback(completionLookback)
     configuration
   }
 
