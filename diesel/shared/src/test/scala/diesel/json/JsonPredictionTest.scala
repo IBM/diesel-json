@@ -17,6 +17,7 @@
 package diesel.json
 
 import diesel.AstHelpers.predict
+import diesel.CompletionConfiguration
 import munit.FunSuite
 
 class JsonPredictionTest extends FunSuite {
@@ -26,7 +27,9 @@ class JsonPredictionTest extends FunSuite {
     offset: Int,
     expectedPredictions: Seq[String]
   ): Unit = {
-    val proposals = predict(Json, text, offset, None)
+    val config    = new CompletionConfiguration()
+    config.setLookback(JsonCompletion.completionLookback)
+    val proposals = predict(Json, text, offset, Some(config))
     assert(
       proposals.map(_.text) == expectedPredictions
     )
@@ -79,8 +82,8 @@ class JsonPredictionTest extends FunSuite {
 
   test("object attr value predicts comma") {
     assertPredictions(
-      """{ "x": 0""",
-      8,
+      """{ "x": 0 """,
+      9,
       Seq(",", "}")
     )
   }
