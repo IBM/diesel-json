@@ -171,8 +171,8 @@ class JsonCustomPredictionTest extends FunSuite {
     val expected = Seq(emptyString, address, rating)
     assertPredictions(
       customerSchema,
-      """{ "name": "foo"""",
-      15,
+      """{ "name": "foo" """,
+      16,
       expectedAfterField
     )
   }
