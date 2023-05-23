@@ -1,5 +1,13 @@
 # Changelog
 
+## v0.9.1 (23/05/2023)
+
+#### closed
+
+- [**closed**] Do not propose attributes for values that cycle [#8](https://github.com/IBM/diesel-json/pull/8)
+
+---
+
 ## v0.9.0 (16/05/2023)
 
 #### closed
