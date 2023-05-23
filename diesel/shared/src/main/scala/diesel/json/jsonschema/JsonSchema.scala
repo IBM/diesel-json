@@ -18,7 +18,7 @@ package diesel.json.jsonschema
 
 import diesel.SimpleMarkerMessage
 import diesel.Errors.SemanticError
-import diesel.json.Ast.Constants.astNull
+import diesel.json.Ast.Constants.{astNull, astObject}
 import diesel.json.Ast.{Position, Value}
 import diesel.json.{Ast, Json}
 import diesel.{GenericTree, Marker}
@@ -156,9 +156,10 @@ object JsonSchema extends JsonSchemaParser {
     maxDepth: Int,
     proposed: Map[Ast.Value, JPath] = Map.empty
   ): Seq[Ast.Value] = {
+
     val resultsAtPath = validationResult.flatten.filter(_.path == path)
     val proposals     = resultsAtPath.flatMap(_.getProposals()).distinct
-    if (maxDepth <= 0) {
+    if (maxDepth < 0) {
       proposals
     } else {
       proposals.map {
@@ -168,7 +169,7 @@ object JsonSchema extends JsonSchemaParser {
 
           val alreadyProposed = alreadyProposedPath.exists(_.isParentOf(path))
           if (alreadyProposed) {
-            x
+            astObject
           } else {
 
             // it's an object : we create a new top-level
