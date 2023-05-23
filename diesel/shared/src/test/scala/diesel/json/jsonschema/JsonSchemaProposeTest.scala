@@ -51,9 +51,7 @@ class JsonSchemaProposeTest extends FunSuite {
     }
     val vr        = s._2.validate(j)
     val proposals = JsonSchema.propose(vr, j, path, maxDepth)
-    assert(
-      proposals == expectedProposals
-    )
+    assertEquals(proposals, expectedProposals)
   }
 
   test("schema propose bool") {
@@ -239,7 +237,7 @@ class JsonSchemaProposeTest extends FunSuite {
     )
   }
 
-  test("examples Cycle") {
+  test("examples Cycle 1") {
     assertSchemaProposals(
       Examples.Cycle,
       Seq(
@@ -249,18 +247,52 @@ class JsonSchemaProposeTest extends FunSuite {
         )
       )
     )
+  }
+
+  private val EXPECTED_CYCLE = Seq(
+    obj(
+      "name" -> astStr,
+      "next" -> astObject
+    )
+  )
+
+  test("examples Cycle 2") {
     assertSchemaProposals(
       Examples.Cycle,
-      Seq(
-        obj(
-          "name" -> astStr,
-          "next" -> obj(
-            "name" -> astNull,
-            "next" -> astNull
-          )
-        )
-      ),
+      EXPECTED_CYCLE,
       maxDepth = 1
+    )
+  }
+
+  test("examples Cycle 3") {
+    assertSchemaProposals(
+      Examples.Cycle,
+      EXPECTED_CYCLE,
+      maxDepth = 2
+    )
+  }
+
+  test("examples Cycle 4") {
+    assertSchemaProposals(
+      Examples.Cycle,
+      EXPECTED_CYCLE,
+      maxDepth = 3
+    )
+  }
+
+  test("examples Cycle 5") {
+    assertValidationProposals(
+      Examples.Cycle,
+      """{
+        |  "name": "",
+        |  "next": {
+        |    "name": "",
+        |    "next": {}
+        |  }
+        |}""".stripMargin,
+      "/next",
+      EXPECTED_CYCLE,
+      3
     )
   }
 
