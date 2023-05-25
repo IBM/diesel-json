@@ -590,6 +590,11 @@ object Schema2020_12 extends JsonSchemaParser {
     }
   }
 
+  case class Renderer(
+    key: String,
+    value: Option[Ast.Value]
+  )
+
   case class SchemaObject(
     node: Ast.Object,
     title: Option[String] = None,
@@ -604,7 +609,8 @@ object Schema2020_12 extends JsonSchemaParser {
     not: Option[JsonSchema] = None,
     ifThenElse: Option[IfThenElse] = None,
     default: Option[Ast.Value] = None,
-    examples: Option[Ast.Array] = None
+    examples: Option[Ast.Array] = None,
+    renderer: Option[Renderer] = None
   ) extends JsonSchema {
     val schema = "http://json-schema.org/draft/2019-09/schema#"
 
@@ -718,6 +724,19 @@ object Schema2020_12 extends JsonSchemaParser {
               }
               .getOrElse(parseTypeUnspecified(obj, context))
 
+            val renderer = obj
+              .attr("renderer")
+              .flatMap {
+                case o @ Ast.Object(_, attributes) =>
+                  val key = attributes.find(_.name.s == "key").flatMap(_.value.asString);
+                  key.map(k => Renderer(k, Some(o)))
+                case Ast.Str(_, v)                 =>
+                  Some(Renderer(v, None))
+                case x @ _                         =>
+                  println("Unsupported renderer " + x)
+                  None
+              }
+
             val id = obj.attr("$id").flatMap(_.asString)
             context.addSchema(
               id,
@@ -733,7 +752,8 @@ object Schema2020_12 extends JsonSchemaParser {
                 ifThenElse = parseIfThenElse(obj, context),
                 const = obj.attr("const"),
                 default = obj.attr("default"),
-                examples = obj.attr("examples").flatMap(_.asAstArray)
+                examples = obj.attr("examples").flatMap(_.asAstArray),
+                renderer = renderer
               )
             )
         }

@@ -56,6 +56,18 @@ export function propose(
   return JsonSchemaJsFacade.propose(res, path, maxDepth);
 }
 
+export interface JsRenderer {
+  readonly key: string;
+  readonly value: any;
+}
+
+export function getRenderers(
+    res: JsValidationResult
+): ReadonlyMap<string, JsRenderer | undefined> {
+  // @ts-ignore
+  return JsonSchemaJsFacade.getRenderers(res)
+}
+
 export function getFormats(
   res: JsValidationResult,
   path: string,
