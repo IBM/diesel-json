@@ -16,59 +16,51 @@
 
 package diesel.json.jsonschema
 
-import diesel.json.Ast.Builder._
 import diesel.json.jsonschema.Schema2020_12.Renderer
 import munit.FunSuite
 
 class JsonSchemaRendererTest extends FunSuite {
 
   test("get renderer 1") {
-    val s         = Util.parseSchema(
+    val schemaValue = Util.parseJson(
       """{
         | "type": "string",
         | "renderer": "Yalla"
         |}""".stripMargin
-    )
-    val value     = Util.parseJson(""""yolo"""")
-    val res       = s.validate(value)
-    val resAtPath = res.flatten.find(r => r.path == JPath.empty).get
-    assertEquals(resAtPath.renderer, Some(Renderer("Yalla", None)))
+    ).asAstObject.get
+    val s           = Util.parseSchemaValue(schemaValue)
+    val value       = Util.parseJson(""""yolo"""")
+    val res         = s.validate(value)
+    val resAtPath   = res.flatten.find(r => r.path == JPath.empty).get
+    assertEquals(resAtPath.renderer, Some(Renderer("Yalla", schemaValue)))
   }
 
-  private def clearRendererPos(renderer: Renderer): Renderer =
-    renderer.copy(value = renderer.value.map(_.clearPosition))
+//  private def clearRendererPos(renderer: Renderer): Renderer =
+//    renderer.copy(value = renderer.value.map(_.clearPosition))
 
   test("get renderer 2") {
-    val s         = Util.parseSchema(
+    val schemaValue = Util.parseJson(
       """{
         | "type": "string",
         | "renderer": {
         |   "key": "Yalla"
         | }
         |}""".stripMargin
-    )
-    val value     = Util.parseJson(""""yolo"""")
-    val res       = s.validate(value)
-    val resAtPath = res.flatten.find(r => r.path == JPath.empty).get
+    ).asAstObject.get
+    val s           = Util.parseSchemaValue(schemaValue)
+    val value       = Util.parseJson(""""yolo"""")
+    val res         = s.validate(value)
+    val resAtPath   = res.flatten.find(r => r.path == JPath.empty).get
     assertEquals(
-      resAtPath.renderer.map(clearRendererPos),
+      resAtPath.renderer,
       Some(
-        Renderer(
-          "Yalla",
-          Some(
-            obj(
-              Seq(
-                attr("key", str("Yalla"))
-              )
-            )
-          )
-        )
+        Renderer("Yalla", schemaValue)
       )
     )
   }
 
   test("get renderer 3") {
-    val s         = Util.parseSchema(
+    val schemaValue = Util.parseJson(
       """{
         | "type": "string",
         | "renderer": {
@@ -76,24 +68,15 @@ class JsonSchemaRendererTest extends FunSuite {
         |   "foo": 123
         | }
         |}""".stripMargin
-    )
-    val value     = Util.parseJson(""""yolo"""")
-    val res       = s.validate(value)
-    val resAtPath = res.flatten.find(r => r.path == JPath.empty).get
+    ).asAstObject.get
+    val s           = Util.parseSchemaValue(schemaValue)
+    val value       = Util.parseJson(""""yolo"""")
+    val res         = s.validate(value)
+    val resAtPath   = res.flatten.find(r => r.path == JPath.empty).get
     assertEquals(
-      resAtPath.renderer.map(clearRendererPos),
+      resAtPath.renderer,
       Some(
-        Renderer(
-          "Yalla",
-          Some(
-            obj(
-              Seq(
-                attr("key", str("Yalla")),
-                attr("foo", num(123))
-              )
-            )
-          )
-        )
+        Renderer("Yalla", schemaValue)
       )
     )
   }

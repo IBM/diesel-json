@@ -58,7 +58,7 @@ export function propose(
 
 export interface JsRenderer {
   readonly key: string;
-  readonly value: any;
+  readonly schemaValue: any;
 }
 
 export function getRenderers(

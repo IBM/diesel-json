@@ -189,18 +189,19 @@ class JsonSchemaJsFacadeTest extends FunSuite {
   }
 
   test("renderer simple") {
-    val schema    = parse(
+    val schema         = parse(
       """{
         |  "type" : "string",
         |  "renderer": "Yalla"
         |}""".stripMargin
     )
-    val value     = parse("\"Yo\"")
-    val res       = JsonSchemaJsFacade.validate(schema, value)
-    val renderers = JsonSchemaJsFacade.getRenderers(res)
+    val value          = parse("\"Yo\"")
+    val res            = JsonSchemaJsFacade.validate(schema, value)
+    val renderers      = JsonSchemaJsFacade.getRenderers(res)
     assertEquals(renderers.size, 1)
     assertEquals(renderers.get("").get.key, "Yalla")
-    assertEquals(renderers.get("").get.value, js.undefined)
+    val rendererSchema = JsValue.toValue(renderers.get("").get.schemaValue)
+    assertEquals(rendererSchema, JsValue.toValue(schema))
   }
 
   test("renderer key nested") {
@@ -228,9 +229,24 @@ class JsonSchemaJsFacadeTest extends FunSuite {
     val renderers = JsonSchemaJsFacade.getRenderers(res)
     assertEquals(renderers.size, 2)
     assertEquals(renderers.get("foo").get.key, "RenderFoo")
-    assertEquals(renderers.get("foo").get.value, js.undefined)
+    assertEquals(
+      JsValue.toValue(renderers.get("foo").get.schemaValue),
+      JsValue.toValue(parse("""{
+                              |  "type": "string",
+                              |  "renderer": "RenderFoo"
+                              |}""".stripMargin))
+    )
     assertEquals(renderers.get("bar").get.key, "RenderBar")
-    assertEquals(renderers.get("bar").get.value, js.undefined)
+    assertEquals(
+      JsValue.toValue(renderers.get("bar").get.schemaValue),
+      JsValue.toValue(parse(
+        """{
+          |  "type": "string",
+          |  "renderer": "RenderBar"
+          |}
+          |""".stripMargin
+      ))
+    )
   }
 
 }

@@ -65,7 +65,7 @@ describe('renderers', function () {
     const r = renderers.get("");
     expect(r).toBeDefined();
     expect(r?.key).toBe("Yalla");
-    expect(r?.value).toBeUndefined();
+    expect(r?.schemaValue).toEqual(schema);
     expect(renderers.get("yolo")).toBeUndefined();
   });
 
@@ -86,7 +86,7 @@ describe('renderers', function () {
     const r = renderers.get("");
     expect(r).toBeDefined();
     expect(r?.key).toBe("Yalla");
-    expect(r?.value).toEqual(renderer);
+    expect(r?.schemaValue).toEqual(schema);
     expect(renderers.get("yolo")).toBeUndefined();
   })
 

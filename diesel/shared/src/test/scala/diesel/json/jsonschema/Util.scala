@@ -26,8 +26,14 @@ object Util {
       case Json.JPRError(message)    =>
         fail(s"Unable to parse schema : $message")
       case Json.JPRSuccess(_, value) =>
-        JsonSchema.parse(value, new JsonSchemaParserContext(value, externalResourceResolver))
+        parseSchemaValue(value, externalResourceResolver)
     }
+
+  def parseSchemaValue(
+    value: Ast.Value,
+    externalResourceResolver: Option[String => Option[String]] = None
+  ): JsonSchema =
+    JsonSchema.parse(value, new JsonSchemaParserContext(value, externalResourceResolver))
 
   def parseJson(text: String): Ast.Value =
     Json.parse(text) match {

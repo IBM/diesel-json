@@ -118,7 +118,7 @@ object JsonSchemaJsFacade {
   @JSExportAll
   class JsRenderer(
     val key: String,
-    val value: Any
+    val schemaValue: Any
   )
 
   @JSExport
@@ -127,8 +127,8 @@ object JsonSchemaJsFacade {
       .flatten
       .flatMap { res =>
         res.renderer.map { r =>
-          val value = r.value.map(v => fromValue(v)).getOrElse(js.undefined)
-          res.path.format -> new JsRenderer(r.key, value)
+          val schemaValue = fromValue(r.schemaValue)
+          res.path.format -> new JsRenderer(r.key, schemaValue)
         }
       }
       .toMap

@@ -592,7 +592,7 @@ object Schema2020_12 extends JsonSchemaParser {
 
   case class Renderer(
     key: String,
-    value: Option[Ast.Value]
+    schemaValue: Ast.Object
   )
 
   case class SchemaObject(
@@ -727,12 +727,12 @@ object Schema2020_12 extends JsonSchemaParser {
             val renderer = obj
               .attr("renderer")
               .flatMap {
-                case o @ Ast.Object(_, attributes) =>
+                case Ast.Object(_, attributes) =>
                   val key = attributes.find(_.name.s == "key").flatMap(_.value.asString);
-                  key.map(k => Renderer(k, Some(o)))
-                case Ast.Str(_, v)                 =>
-                  Some(Renderer(v, None))
-                case x @ _                         =>
+                  key.map(k => Renderer(k, obj))
+                case Ast.Str(_, v)             =>
+                  Some(Renderer(v, obj))
+                case x @ _                     =>
                   println("Unsupported renderer " + x)
                   None
               }
