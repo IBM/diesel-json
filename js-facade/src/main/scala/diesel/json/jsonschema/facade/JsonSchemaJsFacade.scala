@@ -27,6 +27,8 @@ import scala.scalajs.js.annotation.{JSExport, JSExportAll, JSExportTopLevel}
 import diesel.json.i18n.I18n
 import diesel.i18n.Lang
 
+import scala.scalajs.js.JSConverters._
+
 @JSExportTopLevel("JsonSchemaJsFacade")
 object JsonSchemaJsFacade {
 
@@ -111,6 +113,26 @@ object JsonSchemaJsFacade {
       }
     val names                                     = filtered.map(_.name)
     js.Array(names: _*)
+  }
+
+  @JSExportAll
+  class JsRenderer(
+    val key: String,
+    val schemaValue: Any
+  )
+
+  @JSExport
+  def getRenderers(validationResult: JsValidationResult): js.Map[String, JsRenderer] = {
+    validationResult.res
+      .flatten
+      .flatMap { res =>
+        res.renderer.map { r =>
+          val schemaValue = fromValue(r.schemaValue)
+          res.path.format -> new JsRenderer(r.key, schemaValue)
+        }
+      }
+      .toMap
+      .toJSMap
   }
 
   private def toJsError(e: JsonValidationError): JsValidationError =
