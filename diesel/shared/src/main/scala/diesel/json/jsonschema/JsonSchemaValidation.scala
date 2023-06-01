@@ -42,6 +42,9 @@ sealed trait JsonSchemaValidationResult extends HasErrors with HasChildResults w
     val childResults = this.getChildren.flatMap(_.flatten)
     Seq(this) ++ childResults
   }
+
+  def renderer: Option[Renderer]
+
 }
 
 sealed trait JsonValidationError                                                          extends HasPath             {
@@ -256,6 +259,8 @@ case class EmptyArrayValidationResult(schema: JsonSchema, path: JPath, result: J
 
   override def getChildren: Seq[JsonSchemaValidationResult] = Seq.empty
 
+  override def renderer: Option[Renderer] = None
+
   override def getProposals(results: Set[JsonSchemaValidationResult]): Seq[Ast.Value] = result.getProposals(results)
 }
 
@@ -310,6 +315,8 @@ case class SchemaBoolValidation(schema: SchemaBool, path: JPath, v: Boolean) ext
 
   override def getChildren: Seq[JsonSchemaValidationResult] = Seq.empty
 
+  override def renderer: Option[Renderer] = None
+
   override def getErrors: Seq[JsonValidationError] =
     if (v) {
       Seq.empty
@@ -337,6 +344,8 @@ case class SchemaObjectValidation(
   not: Option[JsonSchemaValidationResult] = None,
   ifThenElse: Option[IfThenElseValidation] = None
 ) extends JsonSchemaValidationResult {
+
+  override def renderer: Option[Renderer] = schema.renderer
 
   override def getProposals(results: Set[JsonSchemaValidationResult]): Seq[Ast.Value] = {
     val newResults = results + this
@@ -437,9 +446,9 @@ case class SchemaObjectValidation(
 
   }
 
-  def reduceErrors(errors: Seq[JsonValidationError]): Seq[JsonValidationError] = {
+  private def reduceErrors(errors: Seq[JsonValidationError]): Seq[JsonValidationError] = {
     val errsByPath = errors.groupBy(_.path)
-    errsByPath.flatMap { case (path, errs) =>
+    errsByPath.flatMap { case (_, errs) =>
       reduceErrorsAtPath(errs)
     }.toSeq.sortBy(_.path.format)
   }

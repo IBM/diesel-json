@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import {validate, getErrors, JsValidationError, propose, getJsonParser } from './index';
+import {validate, getErrors, JsValidationError, propose, getJsonParser, getRenderers} from './index';
 
 function withErrors(
   schema: any,
@@ -51,6 +51,45 @@ describe('validate', () => {
       },
     );
   });
+});
+
+describe('renderers', function () {
+  test("get renderers 1", () => {
+    const schema = {
+      type: "string",
+      renderer: "Yalla"
+    };
+    const res = validate(schema, "Yo");
+    const renderers = getRenderers(res);
+    expect(renderers.size).toBe(1);
+    const r = renderers.get("");
+    expect(r).toBeDefined();
+    expect(r?.key).toBe("Yalla");
+    expect(r?.schemaValue).toEqual(schema);
+    expect(renderers.get("yolo")).toBeUndefined();
+  });
+
+  test("get renderers 2", () => {
+    const renderer = {
+      key: "Yalla",
+      foo: 123
+    };
+
+    const schema = {
+      type: "string",
+      renderer,
+    };
+
+    const res = validate(schema, "Yo");
+    const renderers = getRenderers(res);
+    expect(renderers.size).toBe(1);
+    const r = renderers.get("");
+    expect(r).toBeDefined();
+    expect(r?.key).toBe("Yalla");
+    expect(r?.schemaValue).toEqual(schema);
+    expect(renderers.get("yolo")).toBeUndefined();
+  })
+
 });
 
 function withProposals(
