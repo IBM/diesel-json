@@ -18,6 +18,7 @@ package diesel.json.jsonschema
 
 import diesel.facade.ParseRequest
 import diesel.json.jsonschema.facade.JsonSchemaJsFacade
+import diesel.json.jsonschema.facade.JsonSchemaJsFacade.JsValidationError
 import munit.FunSuite
 
 import scala.scalajs.js
@@ -27,30 +28,62 @@ class JsonSchemaJsFacadeTest extends FunSuite {
 
   private def parse(json: String): js.Any = js.JSON.parse(json)
 
-  private def doValidate(schema: js.Any, value: js.Any): js.Array[JsonSchemaJsFacade.JsValidationError] = {
-    JsonSchemaJsFacade.getErrors(
-      JsonSchemaJsFacade.validate(schema, value)
+  private def doPropose(schema: js.Any, value: js.Any, path: String): js.Array[Any] = {
+    val res = JsonSchemaJsFacade.validate(schema, value)
+    res.propose(path)
+  }
+
+  test("js validation res get errors") {
+    val schema = parse(
+      """{
+        |   "type": "object",
+        |   "properties": {
+        |     "foo": {
+        |       "type": "string"
+        |     }
+        |   }
+        |}""".stripMargin
+    )
+    val value  = parse(
+      """{
+        | "foo": 123
+        |}""".stripMargin
+    )
+    val res    = JsonSchemaJsFacade.validate(schema, value)
+    assertEquals(res.getErrors("").toSeq, Seq.empty)
+    assertEquals(
+      res.getErrors("foo").toSeq,
+      Seq(
+        JsValidationError("foo", "Invalid type: expected string")
+      )
     )
   }
 
-  private def doPropose(schema: js.Any, value: js.Any, path: String): js.Array[Any] = {
-    val res = JsonSchemaJsFacade.validate(schema, value)
-    JsonSchemaJsFacade.propose(res, path)
+  test("formats") {
+    val schema = parse(
+      """{
+        |   "type": "string",
+        |   "format": "date-time"
+        |}""".stripMargin
+    )
+    val value  = parse("\"yalla\"")
+    val res    = JsonSchemaJsFacade.validate(schema, value)
+    assertEquals(res.getFormats("").toSeq, Seq("date-time"))
   }
 
   test("no errors") {
     val schema = parse("{}")
     val value  = parse("123")
-    val res    = doValidate(schema, value)
-    assert(res.isEmpty)
+    val res    = JsonSchemaJsFacade.validate(schema, value)
+    assert(res.getErrors("").isEmpty)
   }
 
   test("nothing validates") {
     val schema = parse("false")
     val value  = parse("123")
-    val res    = doValidate(schema, value)
-    assert(res.size == 1)
-    val err    = res.head
+    val res    = JsonSchemaJsFacade.validate(schema, value)
+    assert(res.getErrors("").size == 1)
+    val err    = res.getErrors("").head
     assert(err.path.isEmpty)
     assert(err.message == "Nothing validates")
   }
@@ -60,9 +93,9 @@ class JsonSchemaJsFacadeTest extends FunSuite {
                          |  "type" : "string"
                          |}""".stripMargin)
     val value  = parse("true")
-    val res    = doValidate(schema, value)
-    assert(res.size == 1)
-    val err    = res.head
+    val res    = JsonSchemaJsFacade.validate(schema, value)
+    assert(res.getErrors("").size == 1)
+    val err    = res.getErrors("").head
     assert(err.path.isEmpty)
     assert(err.message == "Invalid type: expected string")
   }
@@ -95,9 +128,9 @@ class JsonSchemaJsFacadeTest extends FunSuite {
                         |    },
                         |    "blah": true
                         |}""".stripMargin)
-    val res    = doValidate(schema, value)
-    assert(res.size == 1)
-    val err    = res.head
+    val res    = JsonSchemaJsFacade.validate(schema, value)
+    assert(res.getErrors("blah").size == 1)
+    val err    = res.getErrors("blah").head
     assert(err.path == "blah")
     assert(err.message == "Invalid type: expected string")
   }
