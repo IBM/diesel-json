@@ -33,27 +33,16 @@ export interface JsValidationResult {
   readonly schema: any;
   readonly value: any;
   readonly res: any;
+
+  getErrors(path: string): readonly JsValidationError[];
+  propose(path: string, maxDepth: number): readonly any[];
+  getFormats(path: string): readonly string[];
+
 }
 
 export function validate(schema: any, value: any): JsValidationResult {
   // @ts-ignore
   return JsonSchemaJsFacade.validate(schema, value);
-}
-
-export function getErrors(
-  res: JsValidationResult,
-): ReadonlyArray<JsValidationError> {
-  // @ts-ignore
-  return JsonSchemaJsFacade.getErrors(res);
-}
-
-export function propose(
-  res: JsValidationResult,
-  path: string,
-  maxDepth = -1,
-): ReadonlyArray<any> {
-  // @ts-ignore
-  return JsonSchemaJsFacade.propose(res, path, maxDepth);
 }
 
 export interface JsRenderer {
@@ -66,14 +55,6 @@ export function getRenderers(
 ): ReadonlyMap<string, JsRenderer | undefined> {
   // @ts-ignore
   return JsonSchemaJsFacade.getRenderers(res)
-}
-
-export function getFormats(
-  res: JsValidationResult,
-  path: string,
-): ReadonlyArray<string> {
-  // @ts-ignore
-  return JsonSchemaJsFacade.getFormats(res, path);
 }
 
 export function getJsonParser(schema: any): DieselParserFacade {
