@@ -28,14 +28,9 @@ class JsonPredictionTest extends FunSuite {
     expectedPredictions: Seq[String]
   ): Unit = {
     val config    = new CompletionConfiguration()
-    config.setLookback(JsonCompletion.completionLookback)
     val proposals = predict(Json, text, offset, Some(config))
-    assert(
-      proposals.map(_.text) == expectedPredictions
-    )
-    assert(
-      proposals.map(_.replace) == expectedPredictions.map(_ => None)
-    )
+    assertEquals(proposals.map(_.text), expectedPredictions)
+    assertEquals(proposals.map(_.replace),expectedPredictions.map(_ => None))
   }
 
   private val allValues = List("null", "0", "true", "false", "[", "{", "\"\"")
