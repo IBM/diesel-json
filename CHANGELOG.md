@@ -1,5 +1,13 @@
 # Changelog
 
+## v0.10.0 (01/06/2023)
+
+#### closed
+
+- [**closed**] Custom Renderers [#9](https://github.com/IBM/diesel-json/pull/9)
+
+---
+
 ## v0.9.1 (23/05/2023)
 
 #### closed
