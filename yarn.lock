@@ -209,10 +209,10 @@
     exec-sh "^0.3.2"
     minimist "^1.2.0"
 
-"@diesel-parser/ts-facade@~0.16.2":
-  version "0.16.2"
-  resolved "https://registry.yarnpkg.com/@diesel-parser/ts-facade/-/ts-facade-0.16.2.tgz#b3f042a54dccb41ab9888d87c444a3a5df83a818"
-  integrity sha512-hnrK3aV/6nKGwVGdXJADX7xLa+XyF+xvMXE87uodZm373EPZDqWqLWVhshEE8baCgs878F9XZ1FTDIGX3SE8ig==
+"@diesel-parser/ts-facade@~0.18.0":
+  version "0.18.0"
+  resolved "https://registry.yarnpkg.com/@diesel-parser/ts-facade/-/ts-facade-0.18.0.tgz#da9d9104faa8bae0a4173e939cdc1bc811b092e9"
+  integrity sha512-pAZ6yBSj6363eqVqIR78l7cQKElBth3sYbXW6r3KqVnBDlwQlR9j6tillr+ax/Te6oU3sFwDkXP23tnQQWvR8Q==
 
 "@iarna/cli@^2.1.0":
   version "2.1.0"
