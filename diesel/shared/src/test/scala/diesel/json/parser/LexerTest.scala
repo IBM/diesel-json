@@ -19,7 +19,7 @@ class LexerTest extends FunSuite {
       case InvalidToken(_)   =>
         Seq.empty
       case ValidToken(token) =>
-        lexerToSeq(lexer) ++ Seq(token)
+        Seq(token) ++ lexerToSeq(lexer)
     }
   }
 

@@ -13,7 +13,18 @@ object Lexer {
     def token(input: String, offset: Int): Option[Token]
   }
 
-  val rules: Seq[Rule] = Seq(NumberRule, BooleanRule, NullRule, StringRule)
+  val rules: Seq[Rule] = Seq(
+    NumberRule,
+    BooleanRule,
+    NullRule,
+    StringRule,
+    OpenArrayRule,
+    CloseArrayRule,
+    OpenObjectRule,
+    CloseObjectRule,
+    CommaRule,
+    SemiColonRule
+  )
 
   object NumberRule extends Rule {
 
@@ -88,6 +99,23 @@ object Lexer {
     }
   }
 
+  class SingleCharRule(val c: Char, val tokenType: TokenType) extends Rule {
+    override def token(input: String, offset: Int): Option[Token] = {
+      if (input.charAt(offset) == c) {
+        Some(Token(offset, 1, tokenType))
+      } else {
+        None
+      }
+    }
+  }
+
+  object OpenArrayRule   extends SingleCharRule('[', OpenArray)
+  object CloseArrayRule  extends SingleCharRule(']', CloseArray)
+  object OpenObjectRule  extends SingleCharRule('{', OpenObject)
+  object CloseObjectRule extends SingleCharRule('}', OpenObject)
+  object CommaRule       extends SingleCharRule(',', Comma)
+  object SemiColonRule   extends SingleCharRule(':', SemiColon)
+
 }
 
 class Lexer(input: String) {
@@ -103,7 +131,7 @@ class Lexer(input: String) {
       curIndex = curIndex + 1
     }
 
-    if (curIndex >= inputLength - 1) {
+    if (curIndex >= inputLength) {
       Eos
     } else {
 
