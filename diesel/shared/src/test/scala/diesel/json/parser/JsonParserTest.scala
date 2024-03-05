@@ -62,4 +62,57 @@ class JsonParserTest extends FunSuite {
     assertParse("[[[]], []]", Right(VArray(Seq(VArray(Seq(VArray(Seq.empty))), VArray(Seq.empty)))))
   }
 
+  test("object empty") {
+    assertParse("{}", Right(VObject(Seq.empty)))
+  }
+
+  test("object one attr") {
+    assertParse("""{ "x" : 1 }""", Right(VObject(Seq(("x" -> VNumber("1"))))))
+  }
+
+  test("object two attrs") {
+    assertParse("""{ "x" : 1, "y": 2 }""", Right(VObject(Seq("x" -> VNumber("1"), "y" -> VNumber("2")))))
+  }
+
+  test("object trailing comma") {
+    assertParse("""{ "x" : 1, }""", Left("Trailing comma at offset 9"))
+  }
+
+  test("object non closed attr 1") {
+    assertParse("""{ " }""", Left("Invalid token at offset 2"))
+  }
+
+  test("object non closed attr 2") {
+    assertParse("""{ "x }""", Left("Invalid token at offset 2"))
+  }
+
+  test("object non closed attr 3") {
+    assertParse("""{ "x" }""", Left("Unexpected token at 6, expected SemiColon, found CloseObject"))
+  }
+
+  test("object non closed attr 4") {
+    assertParse("""{ "x" : }""", Left("Unexpected token '}' at 8"))
+  }
+
+  test("object nested") {
+    assertParse(
+      """{
+        "x": {
+          "y": 123
+        }
+      }""",
+      Right(
+        VObject(
+          Seq(
+            "x" -> VObject(
+              Seq(
+                "y" -> VNumber("123")
+              )
+            )
+          )
+        )
+      )
+    )
+  }
+
 }

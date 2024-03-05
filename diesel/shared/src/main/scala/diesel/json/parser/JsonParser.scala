@@ -48,20 +48,26 @@ class JsonParser(private val input: String, private val lexer: Lexer) {
     s"Unexpected token at $offset, expected $expected, found $found"
   private def failInvalidToken(offset: Int): String                                   = s"Invalid token at offset $offset"
 
-  private def matching(t: TokenType): Option[String] = {
+  private def lookaheadToken: Either[String, Token] =
     lookahead match {
       case Eos(offset)               =>
-        Some(failEos(offset))
+        Left(failEos(offset))
       case InvalidToken(offset)      =>
-        Some(failInvalidToken(offset))
+        Left(failInvalidToken(offset))
       case ValidToken(offset, token) =>
+        Right(token)
+    }
+
+  private def matching(t: TokenType): Either[String, Token] = {
+    lookaheadToken
+      .flatMap(token =>
         if (token.tokenType == t) {
           lookahead = lexer.next()
-          None
+          Right(token)
         } else {
-          Some(failUnexpectedToken(offset, token.tokenType, t))
+          Left(failUnexpectedToken(token.offset, token.tokenType, t))
         }
-    }
+      )
   }
 
   private def tokenText(token: Token): String = {
@@ -72,12 +78,8 @@ class JsonParser(private val input: String, private val lexer: Lexer) {
     }
   }
 
-  def value(): Either[String, Value] = lookahead match {
-    case Eos(offset)               =>
-      Left(failEos(offset))
-    case InvalidToken(offset)      =>
-      Left(failInvalidToken(offset))
-    case ValidToken(offset, token) =>
+  def value(): Either[String, Value] =
+    lookaheadToken.flatMap { token =>
       token.tokenType match {
         case NullLiteral    =>
           moveToNext()
@@ -94,81 +96,102 @@ class JsonParser(private val input: String, private val lexer: Lexer) {
         case OpenArray      =>
           array()
         case OpenObject     =>
-          ???
+          obj()
         case _              =>
-          Left(s"Unexpected token '${tokenText(token)}' at $offset")
+          Left(s"Unexpected token '${tokenText(token)}' at ${token.offset}")
       }
-  }
-
-  def array(): Either[String, Value] =
-    matching(OpenArray) match {
-      case None =>
-        var closed                    = false
-        val values                    = ArrayBuffer[Value]()
-        var err: Option[String]       = None
-        var lastCommaPos: Option[Int] = None
-        while (!closed && err.isEmpty) {
-          lookahead match {
-            case Eos(offset)                                 =>
-              err = Some(failEos(offset))
-            case InvalidToken(offset)                        =>
-              err = Some(failInvalidToken(offset))
-            case ValidToken(offset, Token(_, _, CloseArray)) =>
-              lastCommaPos match {
-                case Some(offset) =>
-                  err = Some(s"Trailing comma at offset $offset")
-                case None         =>
-                  closed = true
-                  moveToNext()
-              }
-            case ValidToken(offset, Token(_, _, Comma))      =>
-              lastCommaPos match {
-                case None        =>
-                  lastCommaPos = Some(offset)
-                  moveToNext()
-                case Some(value) =>
-                  err = Some(s"Unexpected comma at offset $offset")
-              }
-            case _                                           =>
-              value() match {
-                case Left(value)  =>
-                  err = Some(value)
-                case Right(value) =>
-                  values.append(value)
-                  lastCommaPos = None
-              }
-          }
-        }
-        err
-          .map(e => Left(e))
-          .getOrElse(Right(VArray(values.toSeq)))
-
-      case Some(value) =>
-        Left(value)
     }
 
-  // def value(lexer: Lexer): Either[String, Value] = {
-  //     val t = l.next()
-  //     t match {
-  //         case Eos =>
-  //             Left("empty string")
-  //         case InvalidToken(index) =>
-  //             Left("invalid token")
-  //         case ValidToken(token) =>
-  //             token.tokenType match {
-  //                 case OpenArray =>
+  def attr(): Either[String, (String, Value)] =
+    matching(StringLiteral).flatMap { strToken =>
+      matching(SemiColon).flatMap { _ =>
+        value().map { v =>
+          tokenText(strToken).dropRight(1).drop(1) -> v
+        }
+      }
+    }
 
-  //                 case NumberLiteral =>
-  //                 case Comma =>
-  //                 case StringLiteral =>
-  //                 case SemiColon =>
-  //                 case NullLiteral =>
-  //                 case OpenObject =>
-  //                 case CloseArray =>
-  //                 case BooleanLiteral =>
-  //                 case CloseObject =>
-  //             }
-  //     }
-  // }
+  def obj(): Either[String, Value] =
+    matching(OpenObject).flatMap { _ =>
+      var closed     = false
+      val attributes = ArrayBuffer[(String, Value)]()
 
+      var err: Option[String]       = None
+      var lastCommaPos: Option[Int] = None
+      while (!closed && err.isEmpty) {
+        lookaheadToken match {
+          case Left(value)                     =>
+            err = Some(value)
+          case Right(Token(_, _, CloseObject)) =>
+            lastCommaPos match {
+              case Some(offset) =>
+                err = Some(s"Trailing comma at offset $offset")
+              case None         =>
+                closed = true
+                moveToNext()
+            }
+          case Right(Token(offset, _, Comma))  =>
+            lastCommaPos match {
+              case None        =>
+                lastCommaPos = Some(offset)
+                moveToNext()
+              case Some(value) =>
+                err = Some(s"Unexpected comma at offset $offset")
+            }
+          case _                               =>
+            attr() match {
+              case Left(value)  =>
+                err = Some(value)
+              case Right(value) =>
+                attributes.append(value)
+                lastCommaPos = None
+            }
+        }
+      }
+      err
+        .map(e => Left(e))
+        .getOrElse(Right(VObject(attributes.toSeq)))
+    }
+
+  def array(): Either[String, Value] =
+    matching(OpenArray).flatMap { _ =>
+      var closed = false
+      val values = ArrayBuffer[Value]()
+
+      var err: Option[String]       = None
+      var lastCommaPos: Option[Int] = None
+      while (!closed && err.isEmpty) {
+        lookaheadToken match {
+          case Left(value)                    =>
+            err = Some(value)
+          case Right(Token(_, _, CloseArray)) =>
+            lastCommaPos match {
+              case Some(offset) =>
+                err = Some(s"Trailing comma at offset $offset")
+              case None         =>
+                closed = true
+                moveToNext()
+            }
+          case Right(Token(offset, _, Comma)) =>
+            lastCommaPos match {
+              case None        =>
+                lastCommaPos = Some(offset)
+                moveToNext()
+              case Some(value) =>
+                err = Some(s"Unexpected comma at offset $offset")
+            }
+          case _                              =>
+            value() match {
+              case Left(value)  =>
+                err = Some(value)
+              case Right(value) =>
+                values.append(value)
+                lastCommaPos = None
+            }
+        }
+      }
+      err
+        .map(e => Left(e))
+        .getOrElse(Right(VArray(values.toSeq)))
+    }
 }

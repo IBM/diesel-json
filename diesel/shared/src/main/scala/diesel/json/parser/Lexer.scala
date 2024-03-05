@@ -130,7 +130,7 @@ object Lexer {
   object OpenArrayRule   extends SingleCharRule('[', OpenArray)
   object CloseArrayRule  extends SingleCharRule(']', CloseArray)
   object OpenObjectRule  extends SingleCharRule('{', OpenObject)
-  object CloseObjectRule extends SingleCharRule('}', OpenObject)
+  object CloseObjectRule extends SingleCharRule('}', CloseObject)
   object CommaRule       extends SingleCharRule(',', Comma)
   object SemiColonRule   extends SingleCharRule(':', SemiColon)
 

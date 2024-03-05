@@ -112,4 +112,14 @@ class LexerTest extends FunSuite {
     )
   }
 
+  test("object") {
+    assertEquals(
+      tokenize("{}"),
+      Seq(
+        Token(0, 1, OpenObject),
+        Token(1, 1, CloseObject)
+      )
+    )
+  }
+
 }
