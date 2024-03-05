@@ -54,4 +54,12 @@ class JsonParserTest extends FunSuite {
     assertParse("[1,]", Left("Trailing comma at offset 2"))
   }
 
+  test("array not closed") {
+    assertParse("[1,", Left("Unexpected eos at offset 3"))
+  }
+
+  test("array nested") {
+    assertParse("[[[]], []]", Right(VArray(Seq(VArray(Seq(VArray(Seq.empty))), VArray(Seq.empty)))))
+  }
+
 }

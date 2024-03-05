@@ -43,10 +43,10 @@ class JsonParser(private val input: String, private val lexer: Lexer) {
     lookahead = lexer.next()
   }
 
-  private def failEos(offset: Int)                                                    = s"eos at $offset"
+  private def failEos(offset: Int)                                                    = s"Unexpected eos at offset $offset"
   private def failUnexpectedToken(offset: Int, found: TokenType, expected: TokenType) =
     s"Unexpected token at $offset, expected $expected, found $found"
-  private def failInvalidToken(offset: Int): String                                   = s"invalid token at $offset"
+  private def failInvalidToken(offset: Int): String                                   = s"Invalid token at offset $offset"
 
   private def matching(t: TokenType): Option[String] = {
     lookahead match {
