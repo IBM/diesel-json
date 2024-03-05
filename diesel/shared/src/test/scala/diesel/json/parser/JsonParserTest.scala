@@ -115,4 +115,37 @@ class JsonParserTest extends FunSuite {
     )
   }
 
+  test("mix") {
+    assertParse(
+      """{
+        "x": [
+          1, 
+          2,
+          { 
+            "y": true,
+            "z": "yalla"
+          }
+        ]
+      }""",
+      Right(
+        VObject(
+          Seq(
+            "x" -> VArray(
+              Seq(
+                VNumber("1"),
+                VNumber("2"),
+                VObject(
+                  Seq(
+                    "y" -> VBool(true),
+                    "z" -> VString("\"yalla\"")
+                  )
+                )
+              )
+            )
+          )
+        )
+      )
+    )
+  }
+
 }
