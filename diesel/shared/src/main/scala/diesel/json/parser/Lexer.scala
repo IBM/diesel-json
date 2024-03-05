@@ -1,13 +1,31 @@
+/*
+ * Copyright 2018 The Diesel Authors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package diesel.json.parser
 
 object Lexer {
 
   def apply(input: String): Lexer = new Lexer(input)
 
-  sealed trait NextToken
-  case object Eos                     extends NextToken
-  case class InvalidToken(index: Int) extends NextToken
-  case class ValidToken(token: Token) extends NextToken
+  sealed trait NextToken {
+    val offset: Int
+  }
+  case class Eos(offset: Int)                      extends NextToken
+  case class InvalidToken(offset: Int)             extends NextToken
+  case class ValidToken(offset: Int, token: Token) extends NextToken
 
   sealed trait Rule {
     def token(input: String, offset: Int): Option[Token]
@@ -132,7 +150,7 @@ class Lexer(input: String) {
     }
 
     if (curIndex >= inputLength) {
-      Eos
+      Eos(curIndex)
     } else {
 
       // try lexer rules
@@ -149,8 +167,9 @@ class Lexer(input: String) {
         case None    =>
           InvalidToken(curIndex)
         case Some(t) =>
+          val i = curIndex
           curIndex += t.length
-          ValidToken(t)
+          ValidToken(i, t)
       }
     }
   }
