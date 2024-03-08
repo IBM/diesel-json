@@ -28,6 +28,10 @@ import diesel.json.i18n.I18n
 import diesel.i18n.Lang
 
 import scala.scalajs.js.JSConverters._
+import diesel.facade.PredictRequest
+import diesel.facade.ParseRequest
+import diesel.facade.ParseContext
+import diesel.facade.PredictContext
 
 @JSExportTopLevel("JsonSchemaJsFacade")
 object JsonSchemaJsFacade {
@@ -42,12 +46,23 @@ object JsonSchemaJsFacade {
     }
   }
 
+  private def parseContextFactory(mpp: MarkerPostProcessor): ParseRequest => ParseContext =
+    r => ParseContext(markerPostProcessor = Some(mpp))
+
+  private def predictContextFactory(mpp: MarkerPostProcessor): PredictRequest => PredictContext =
+    r => PredictContext(markerPostProcessor = Some(mpp))
+
   @JSExport
   def getJsonParser(schema: Any): DieselParserFacade = {
     val s: Ast.Value            = toValue(schema)
     val schemaVal               = JsonSchema.parse(s, new JsonSchemaParserContext(s))
     val completionConfiguration = JsonCompletion.completionConfiguration(schemaVal)
-    new DieselParserFacade(Json, Some(completionConfiguration), None, Some(new JsonMarkerPostProcessor(schemaVal)))
+    val markerPostProcessor     = new JsonMarkerPostProcessor(schemaVal)
+    new DieselParserFacade(
+      Json,
+      Some(parseContextFactory(markerPostProcessor)),
+      Some(predictContextFactory(markerPostProcessor))
+    )
   }
 
   @JSExportAll

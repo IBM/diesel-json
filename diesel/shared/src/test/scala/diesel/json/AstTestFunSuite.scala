@@ -16,11 +16,29 @@
 
 package diesel.json
 
-import diesel.AstHelpers.{assertAst, assertNoMarkers}
 import diesel.Dsl
 import munit.FunSuite
+import diesel.GenericTree
+import diesel.AstHelpers.assertNoMarkers
+import diesel.AstHelpers
+import diesel.Navigator
 
 abstract class AstTestFunSuite extends FunSuite {
+
+  private def assertAst(dsl: Dsl)(text: String)(f: GenericTree => Unit) = {
+    val res = AstHelpers.parse(dsl, text)
+    if (res.success) {
+      val n = Navigator(res)
+      n.expectOneTree() match {
+        case Left(err)    =>
+          fail(err._1)
+        case Right(value) =>
+          f(value)
+      }
+    } else {
+      fail("Parsing error !")
+    }
+  }
 
   def testAst[T](text: String)(expected: => T)(implicit dsl: Dsl, loc: munit.Location): Unit = {
     val testName = getTestNameFromText(text)
