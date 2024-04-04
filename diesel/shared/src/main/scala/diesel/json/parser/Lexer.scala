@@ -16,161 +16,181 @@
 
 package diesel.json.parser
 
+import scala.io.Source
+
 object Lexer {
 
-  def apply(input: String): Lexer = new Lexer(input)
+  sealed trait TokenType
+  case object StringLiteral  extends TokenType
+  case object BooleanLiteral extends TokenType
+  case object NullLiteral    extends TokenType
+  case object NumberLiteral  extends TokenType
+  case object OpenObject     extends TokenType
+  case object CloseObject    extends TokenType
+  case object OpenArray      extends TokenType
+  case object CloseArray     extends TokenType
+  case object SemiColon      extends TokenType
+  case object Comma          extends TokenType
+  case object Invalid        extends TokenType
 
-  sealed trait NextToken {
-    val offset: Int
-  }
-  case class Eos(offset: Int)                      extends NextToken
-  case class InvalidToken(offset: Int)             extends NextToken
-  case class ValidToken(offset: Int, token: Token) extends NextToken
+  case class Token(offset: Int, length: Int, tokenType: TokenType)
 
-  sealed trait Rule {
-    def token(input: String, offset: Int): Option[Token]
-  }
-
-  val rules: Seq[Rule] = Seq(
-    NumberRule,
-    BooleanRule,
-    NullRule,
-    StringRule,
-    OpenArrayRule,
-    CloseArrayRule,
-    OpenObjectRule,
-    CloseObjectRule,
-    CommaRule,
-    SemiColonRule
-  )
-
-  object NumberRule extends Rule {
-
-    private val digits: Set[Char] = "0123456789".toSet
-
-    override def token(input: String, offset: Int): Option[Token] = {
-      var index    = offset
-      val len      = input.length()
-      var digit    = true
-      var nbDigits = 0
-      while (index < len && digit) {
-        val charAtIndex = input.charAt(index)
-        digit = digits.contains(charAtIndex)
-        if (digit) {
-          nbDigits = nbDigits + 1
-        }
-        index = index + 1
-      }
-      if (nbDigits > 0) {
-        Some(Token(offset, nbDigits, NumberLiteral))
-      } else {
-        None
-      }
-    }
-  }
-
-  object BooleanRule extends Rule {
-    override def token(input: String, offset: Int): Option[Token] = {
-      val sub = input.drop(offset)
-      if (sub.startsWith("true")) {
-        Some(Token(offset, 4, BooleanLiteral))
-      } else if (sub.startsWith("false")) {
-        Some(Token(offset, 5, BooleanLiteral))
-      } else {
-        None
-      }
-    }
-  }
-
-  object NullRule extends Rule {
-    override def token(input: String, offset: Int): Option[Token] = {
-      if (input.drop(offset).startsWith("null")) {
-        Some(Token(offset, 4, NullLiteral))
-      } else {
-        None
-      }
-    }
-  }
-
-  object StringRule extends Rule {
-    override def token(input: String, offset: Int): Option[Token] = {
-      val l = input.length
-      if (input.charAt(offset) == '"') {
-        var i        = offset + 1
-        var closedAt = -1
-        while (i < l && closedAt == -1) {
-          val c = input.charAt(i)
-          if (c == '"') {
-            closedAt = i
-          } else {
-            i = i + 1
-          }
-        }
-        if (closedAt == -1) {
-          None
-        } else {
-          Some(Token(offset, closedAt - offset + 1, StringLiteral))
-        }
-      } else {
-        None
-      }
-    }
-  }
-
-  class SingleCharRule(val c: Char, val tokenType: TokenType) extends Rule {
-    override def token(input: String, offset: Int): Option[Token] = {
-      if (input.charAt(offset) == c) {
-        Some(Token(offset, 1, tokenType))
-      } else {
-        None
-      }
-    }
-  }
-
-  object OpenArrayRule   extends SingleCharRule('[', OpenArray)
-  object CloseArrayRule  extends SingleCharRule(']', CloseArray)
-  object OpenObjectRule  extends SingleCharRule('{', OpenObject)
-  object CloseObjectRule extends SingleCharRule('}', CloseObject)
-  object CommaRule       extends SingleCharRule(',', Comma)
-  object SemiColonRule   extends SingleCharRule(':', SemiColon)
-
+  def apply(input: String): Lexer = new Lexer(Source.fromString(input))
 }
 
-class Lexer(input: String) {
+class Lexer(input: Source) {
 
-  private var curIndex: Int    = 0
-  private val inputLength: Int = input.length()
+  private var curIndex: Int           = 0
+  private var lookahead: Option[Char] = None
 
   import Lexer._
 
-  def next(): NextToken = {
-    // eat whitespaces
-    while (curIndex < inputLength && input.charAt(curIndex).isWhitespace) {
-      curIndex = curIndex + 1
+  private def eatWhitespaces(): (Option[Char], Int) = {
+    var res: Option[Char] = None
+    var nbNext            = 0
+    while (input.hasNext && res.isEmpty) {
+      val c = input.next()
+      if (!c.isWhitespace) {
+        res = Some(c)
+      } else {
+        nbNext += 1
+      }
+    }
+    (res, nbNext)
+  }
+
+  private def scanStr(): Option[String] = {
+    val buf    = new StringBuilder()
+    var closed = false
+    while (input.hasNext && !closed) {
+      val c = input.next()
+      if (c == '"') {
+        // TODO check escaping
+        closed = true
+      } else {
+        buf.append(c)
+      }
+    }
+    if (closed) {
+      Some(buf.toString())
+    } else {
+      None
+    }
+  }
+
+  private def scanChars(s: String): Boolean = {
+    var i         = 0
+    var foundDiff = false
+    while (input.hasNext && i < s.length && !foundDiff) {
+      val nextChar     = input.next()
+      val nextExpected = s.charAt(i)
+      foundDiff = nextChar != nextExpected
+      i += 1
+    }
+    !foundDiff
+  }
+
+  private val digits        = "123456789".toSet
+  private val digitsAndZero = "0123456789".toSet
+
+  private def scanUnsignedNum(offset: Int, firstChar: Char): Option[(Token, Option[Char])] = {
+    val sb = new StringBuilder()
+
+    if (firstChar == '0') {
+      println("ùml")
     }
 
-    if (curIndex >= inputLength) {
-      Eos(curIndex)
+    if (digitsAndZero.contains(firstChar)) {
+      sb.append(firstChar)
+      var lookahead: Option[Char] = None
+      var isDijit                 = true
+      while (input.hasNext && isDijit) {
+        val ch = input.next()
+        if (digitsAndZero.contains(ch)) {
+          sb.append(ch)
+        } else {
+          isDijit = false
+          lookahead = Some(ch)
+        }
+      }
+      if (sb.length() > 0) {
+        Some((Token(offset, sb.length(), NumberLiteral), lookahead))
+      } else {
+        None
+      }
     } else {
+      Some((Token(offset, 1, Invalid), Some(firstChar)))
+    }
+  }
 
-      // try lexer rules
-      val rulesArr             = rules.toArray
-      val nbRules              = rules.size
-      var ruleIndex            = 0
-      var token: Option[Token] = None
-      while (ruleIndex < nbRules && token.isEmpty) {
-        val rule = rulesArr.apply(ruleIndex)
-        token = rule.token(input, curIndex)
-        ruleIndex = ruleIndex + 1
-      }
-      token match {
-        case None    =>
-          InvalidToken(curIndex)
-        case Some(t) =>
-          val i = curIndex
-          curIndex += t.length
-          ValidToken(i, t)
-      }
+  def next(): Option[Token] = {
+    // eat whitespaces
+    var (curChar, nbSkipped) = eatWhitespaces();
+    curIndex += nbSkipped
+    curChar.flatMap {
+      case '{'     =>
+        val t = Some(Token(curIndex, 1, OpenObject))
+        curIndex += 1
+        t
+      case '}'     =>
+        val t = Some(Token(curIndex, 1, CloseObject))
+        curIndex += 1
+        t
+      case '['     =>
+        val t = Some(Token(curIndex, 1, OpenArray))
+        curIndex += 1
+        t
+      case ']'     =>
+        val t = Some(Token(curIndex, 1, CloseArray))
+        curIndex += 1
+        t
+      case ','     =>
+        val t = Some(Token(curIndex, 1, Comma))
+        curIndex += 1
+        t
+      case ':'     =>
+        val t = Some(Token(curIndex, 1, SemiColon))
+        curIndex += 1
+        t
+      case '"'     =>
+        scanStr().map { s =>
+          val len = s.length()
+          val t   = Token(curIndex, len + 2, StringLiteral)
+          curIndex += s.length() + 1 // closing "
+          t
+        }
+      case 't'     =>
+        if (scanChars("rue")) {
+          val t = Some(Token(curIndex, 4, BooleanLiteral))
+          curIndex += 4
+          t
+        } else {
+          None
+        }
+      case 'f'     =>
+        if (scanChars("alse")) {
+          val t = Some(Token(curIndex, 5, BooleanLiteral))
+          curIndex += 5
+          t
+        } else {
+          None
+        }
+      case 'n'     =>
+        if (scanChars("ull")) {
+          val t = Some(Token(curIndex, 4, NullLiteral))
+          curIndex += 4
+          t
+        } else {
+          None
+        }
+      case c: Char =>
+        scanUnsignedNum(curIndex, c) match {
+          case None           =>
+            Some(Token(curIndex, 0, Invalid))
+          case Some((tk, la)) =>
+            lookahead = la
+            Some(tk)
+        }
     }
   }
 

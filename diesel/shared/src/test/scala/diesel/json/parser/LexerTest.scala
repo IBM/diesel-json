@@ -17,9 +17,7 @@
 package diesel.json.parser
 
 import munit.FunSuite
-import diesel.json.parser.Lexer.Eos
-import diesel.json.parser.Lexer.InvalidToken
-import diesel.json.parser.Lexer.ValidToken
+import diesel.json.parser.Lexer._
 
 class LexerTest extends FunSuite {
 
@@ -30,33 +28,23 @@ class LexerTest extends FunSuite {
 
   private def lexerToSeq(lexer: Lexer): Seq[Token] = {
     lexer.next() match {
-      case Eos(_)               =>
+      case Some(t) =>
+        t.tokenType match {
+          case Invalid =>
+            Seq.empty
+          case _       =>
+            t +: lexerToSeq(lexer)
+        }
+      case None    =>
         Seq.empty
-      case InvalidToken(_)      =>
-        Seq.empty
-      case ValidToken(_, token) =>
-        Seq(token) ++ lexerToSeq(lexer)
     }
   }
 
   private def tokenize(input: String): Seq[Token] =
     lexerToSeq(Lexer(input))
 
-  private def assertNumberRule(text: String, offset: Int, expected: Option[Token]) = {
-    val t = Lexer.NumberRule.token(text, offset)
-    assertEquals(t, expected)
-  }
-
-  test("number rule") {
-    assertNumberRule("", 0, None)
-    assertNumberRule("abc", 0, None)
-    assertNumberRule("  ", 2, None)
-    assertNumberRule("x1", 0, None)
-    assertNumberRule(" 1", 0, None)
-    assertNumberRule("  123", 2, Some(Token(2, 3, NumberLiteral)))
-    assertNumberRule("1", 0, Some(Token(0, 1, NumberLiteral)))
-    assertNumberRule("1   ", 0, Some(Token(0, 1, NumberLiteral)))
-    assertNumberRule("123", 0, Some(Token(0, 3, NumberLiteral)))
+  test("zero") {
+    assertOne("0", Token(0, 1, NumberLiteral))
   }
 
   test("int literal") {
@@ -102,12 +90,12 @@ class LexerTest extends FunSuite {
 
   test("array 2") {
     assertEquals(
-      tokenize("[123,]"),
+      tokenize("[true,]"),
       Seq(
         Token(0, 1, OpenArray),
-        Token(1, 3, NumberLiteral),
-        Token(4, 1, Comma),
-        Token(5, 1, CloseArray)
+        Token(1, 4, BooleanLiteral),
+        Token(5, 1, Comma),
+        Token(6, 1, CloseArray)
       )
     )
   }
@@ -118,6 +106,27 @@ class LexerTest extends FunSuite {
       Seq(
         Token(0, 1, OpenObject),
         Token(1, 1, CloseObject)
+      )
+    )
+  }
+
+  test("truefalse") {
+    assertEquals(
+      tokenize("truefalse"),
+      Seq(
+        Token(0, 4, BooleanLiteral),
+        Token(4, 5, BooleanLiteral)
+      )
+    )
+  }
+
+  test("num true (lookahead)") {
+    assertEquals(
+      tokenize("1,2"),
+      Seq(
+        Token(0, 1, NumberLiteral),
+        Token(1, 1, Comma),
+        Token(2, 1, NumberLiteral)
       )
     )
   }
