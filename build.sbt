@@ -64,7 +64,7 @@ lazy val diesel = crossProject(JSPlatform, JVMPlatform)
       "-Wunused:imports"
     ),
     libraryDependencies ++= Seq(
-      "org.scalameta" %%% "munit" % "0.7.29" % Test
+      "org.scalameta" %%% "munit" % "1.0.0" % Test
     )
   )
   .settings(
@@ -86,7 +86,7 @@ lazy val jsFacade = project
   .settings(copyrightSettings)
   .settings(
     libraryDependencies ++= Seq(
-      "org.scalameta" %%% "munit" % "0.7.29" % Test
+      "org.scalameta" %%% "munit" % "1.0.0" % Test
     ),
     // see https://github.com/scalameta/munit/blob/main/junit-interface/src/main/java/munit/internal/junitinterface/JUnitRunner.java
     Test / testOptions += Tests.Argument("+l", "--summary=1")
