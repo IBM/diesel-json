@@ -3,7 +3,7 @@ import sbtcrossproject.CrossPlugin.autoImport.crossProject
 
 import scala.sys.process._
 
-val scalaVersion_ = "2.13.10"
+val scalaVersion_ = "2.13.14"
 
 lazy val copyrightSettings = Seq(
   startYear := Some(2018),
@@ -64,7 +64,7 @@ lazy val diesel = crossProject(JSPlatform, JVMPlatform)
       "-Wunused:imports"
     ),
     libraryDependencies ++= Seq(
-      "org.scalameta" %%% "munit" % "0.7.29" % Test
+      "org.scalameta" %%% "munit" % "1.0.0" % Test
     )
   )
   .settings(
@@ -74,8 +74,6 @@ lazy val diesel = crossProject(JSPlatform, JVMPlatform)
     Test / testOptions += Tests.Argument("+l", "--summary=1")
   )
   .settings(
-    addCompilerPlugin(scalafixSemanticdb),
-    ThisBuild / scalafixScalaBinaryVersion := CrossVersion.binaryScalaVersion(scalaVersion.value),
     ThisBuild / semanticdbEnabled := true,
     ThisBuild / semanticdbVersion := scalafixSemanticdb.revision
   )
@@ -86,7 +84,7 @@ lazy val jsFacade = project
   .settings(copyrightSettings)
   .settings(
     libraryDependencies ++= Seq(
-      "org.scalameta" %%% "munit" % "0.7.29" % Test
+      "org.scalameta" %%% "munit" % "1.0.0" % Test
     ),
     // see https://github.com/scalameta/munit/blob/main/junit-interface/src/main/java/munit/internal/junitinterface/JUnitRunner.java
     Test / testOptions += Tests.Argument("+l", "--summary=1")
