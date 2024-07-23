@@ -74,8 +74,6 @@ lazy val diesel = crossProject(JSPlatform, JVMPlatform)
     Test / testOptions += Tests.Argument("+l", "--summary=1")
   )
   .settings(
-    addCompilerPlugin(scalafixSemanticdb),
-    ThisBuild / scalafixScalaBinaryVersion := CrossVersion.binaryScalaVersion(scalaVersion.value),
     ThisBuild / semanticdbEnabled := true,
     ThisBuild / semanticdbVersion := scalafixSemanticdb.revision
   )
