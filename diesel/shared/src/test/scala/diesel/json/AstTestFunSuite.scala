@@ -53,7 +53,7 @@ abstract class AstTestFunSuite extends FunSuite {
   private def getTestNameFromText(text: String): String = {
     val trimmed         = text.trim
     val lines           = trimmed.split('\n')
-    lazy val firstLine = {
+    lazy val firstLine  = {
       lines.filterNot(_.isEmpty)(0)
     }
     val oneLineTestName =

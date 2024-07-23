@@ -96,8 +96,8 @@ object Ast {
   }
 
   case class Array(position: Position, elems: Seq[Value]) extends Value {
-    override def clearPosition: Value     = this.copy(position = Position.zero)
-    def elemAt(index: Int): Option[Value] = elems.lift(index)
+    override def clearPosition: Value                = this.copy(position = Position.zero)
+    def elemAt(index: Int): Option[Value]            = elems.lift(index)
     override def find(p: Node => Boolean): Seq[Node] = {
       super.find(p) ++ elems.flatMap(_.find(p))
     }
@@ -134,27 +134,27 @@ object Ast {
 
   object Builder {
 
-    val nullValue: Ast.Null                                  = Ast.Null(Position.zero)
-    def obj(attributes: Seq[Ast.Attribute]): Ast.Object      =
+    val nullValue: Ast.Null                                              = Ast.Null(Position.zero)
+    def obj(attributes: Seq[Ast.Attribute]): Ast.Object                  =
       Ast.Object(Position.zero, attributes)
     def obj(attr: Ast.Attribute, attributes: Ast.Attribute*): Ast.Object = {
       obj(Seq(attr) ++ attributes)
     }
-    def attr(name: String, value: Ast.Value): Ast.Attribute  =
+    def attr(name: String, value: Ast.Value): Ast.Attribute              =
       Ast.Attribute(
         Position.zero,
         Ast.AttrName(Position.zero, name),
         value
       )
-    def array(items: Seq[Ast.Value]): Ast.Array              =
+    def array(items: Seq[Ast.Value]): Ast.Array                          =
       Ast.Array(Position.zero, items)
-    def array(item: Ast.Value, items: Ast.Value*): Ast.Array =
+    def array(item: Ast.Value, items: Ast.Value*): Ast.Array             =
       array(Seq(item) ++ items)
-    def num(value: Double): Ast.Number                       =
+    def num(value: Double): Ast.Number                                   =
       Ast.Number(Position.zero, value)
-    def bool(value: Boolean): Ast.Bool                       =
+    def bool(value: Boolean): Ast.Bool                                   =
       Ast.Bool(Position.zero, value)
-    def str(value: String): Ast.Str                          =
+    def str(value: String): Ast.Str                                      =
       Ast.Str(Position.zero, value)
 
     object Implicits {
@@ -203,11 +203,13 @@ object Ast {
                     if (attr.name.s == head) {
                       // advance !
                       attr.copy(value =
-                        map(attr.value, JPath(tail))(f))
+                        map(attr.value, JPath(tail))(f)
+                      )
                     } else {
                       attr
                     }
-                  })
+                  }
+                )
               case x: Array  =>
                 Try(head.toInt).toOption
                   .map { pathIndex =>
@@ -218,7 +220,8 @@ object Ast {
                         } else {
                           elemValue
                         }
-                      })
+                      }
+                    )
                   }
                   .getOrElse(x)
               case _         =>

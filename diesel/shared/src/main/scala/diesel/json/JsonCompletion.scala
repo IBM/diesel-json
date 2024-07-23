@@ -62,9 +62,9 @@ object JsonCompletion {
           Seq((x, "["))
         case x: Ast.Number =>
           Seq((x, x.v.toInt.toString)) // TODO we convert to int just to have "0" in preds and not "0.0"...
-        case x: Ast.Str    =>
+        case x: Ast.Str  =>
           Seq((x, "\"" + x.v + "\""))
-        case x: Ast.Bool   =>
+        case x: Ast.Bool =>
           Seq((x, x.v.toString))
       }
     labels.map(l => customProposal(l._2, ValueProposal(l._1)))

@@ -6,7 +6,7 @@ import scala.sys.process._
 val scalaVersion_ = "2.13.14"
 
 lazy val copyrightSettings = Seq(
-  startYear := Some(2018),
+  startYear        := Some(2018),
   organizationName := "The Diesel Authors",
   licenses += ("Apache-2.0", new URL("https://www.apache.org/licenses/LICENSE-2.0.txt"))
 )
@@ -20,8 +20,8 @@ addCommandAlias("lintFix", "headerCreateAll;scalafixAll;fmt")
 
 inThisBuild(
   List(
-    organization := "com.ibm.cloud.diesel",
-    scalaVersion := scalaVersion_,
+    organization  := "com.ibm.cloud.diesel",
+    scalaVersion  := scalaVersion_,
     versionScheme := Some("semver-spec")
   )
 )
@@ -31,7 +31,7 @@ lazy val root: Project = project
   .aggregate(dieselJVM, dieselJS, jsFacade)
   .settings(copyrightSettings)
   .settings(
-    name := "diesel-json-schema-root",
+    name         := "diesel-json-schema-root",
     scalaVersion := scalaVersion_
     // publish / skip := true
   )
@@ -42,9 +42,9 @@ lazy val diesel = crossProject(JSPlatform, JVMPlatform)
   .enablePlugins(I18nPlugin)
   .settings(copyrightSettings)
   .settings(
-    name := "diesel-json-schema",
-    scalaVersion := scalaVersion_,
-    i18nDir := file("./diesel/i18n"),
+    name          := "diesel-json-schema",
+    scalaVersion  := scalaVersion_,
+    i18nDir       := file("./diesel/i18n"),
     i18nClassName := "diesel.json.i18n.I18nFiles"
   )
   .settings(
@@ -68,7 +68,7 @@ lazy val diesel = crossProject(JSPlatform, JVMPlatform)
     )
   )
   .settings(
-    Test / fork := false,
+    Test / fork        := false,
     Test / logBuffered := false,
     // see https://github.com/scalameta/munit/blob/main/junit-interface/src/main/java/munit/internal/junitinterface/JUnitRunner.java
     Test / testOptions += Tests.Argument("+l", "--summary=1")
