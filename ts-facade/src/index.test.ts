@@ -14,15 +14,16 @@
  * limitations under the License.
  */
 
-import {validate, getErrors, JsValidationError, propose, getJsonParser, getRenderers} from './index';
+import {validate, JsValidationError, getJsonParser, getRenderers} from './index';
 
 function withErrors(
   schema: any,
   value: any,
+  path: string,
   f: (errors: ReadonlyArray<JsValidationError>) => void,
 ) {
   const res = validate(schema, value);
-  const errors = getErrors(res);
+  const errors = res.getErrors(path);
   expect(schema).toBe(res.schema);
   expect(value).toBe(res.value);
   f(errors);
@@ -35,6 +36,7 @@ describe('validate', () => {
         type: 'string',
       },
       'toto',
+        '',
       (errors) => expect(errors.length).toBe(0),
     );
   });
@@ -44,6 +46,7 @@ describe('validate', () => {
         type: 'string',
       },
       123,
+        '',
       (errors) => {
         expect(errors.length).toBe(1);
         expect(errors[0].path).toBe('');
@@ -102,7 +105,7 @@ function withProposals(
   const res = validate(schema, value);
   expect(schema).toBe(res.schema);
   expect(value).toBe(res.value);
-  const proposals = propose(res, path, maxDepth);
+  const proposals = res.propose(path, maxDepth);
   f(proposals);
 }
 

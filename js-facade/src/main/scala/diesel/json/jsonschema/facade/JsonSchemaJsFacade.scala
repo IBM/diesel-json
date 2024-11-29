@@ -74,19 +74,59 @@ object JsonSchemaJsFacade {
     I18n.setLang(Lang.fromNavigator(lang).getOrElse(Lang.EN))
   }
 
-  @JSExportAll
+  @JSExport
   class JsValidationResult(
     val schemaValue: Ast.Value,
-    val schema: Any,
+    @JSExport val schema: Any,
     val valueValue: Ast.Value,
-    val value: Any,
-    val res: JsonSchemaValidationResult
-  )
+    @JSExport val value: Any,
+    @JSExport val res: JsonSchemaValidationResult
+  ) {
 
-  @JSExport
-  def getErrors(res: JsValidationResult): js.Array[JsValidationError] = {
-    val jsErrs = res.res.getErrors.map(toJsError)
-    js.Array(jsErrs: _*)
+    private lazy val errorsByPath: Map[String, js.Array[JsValidationError]] =
+      res.getErrors.groupBy(_.path).map { t =>
+        val fmtPath  = t._1.format
+        val jsErrors = t._2.map(toJsError)
+        fmtPath -> jsErrors.toJSArray
+      }
+
+    @JSExport
+    def getErrors(path: String): js.Array[JsValidationError] = errorsByPath.getOrElse(path, js.Array())
+
+    @JSExport
+    def propose(path: String, maxDepth: Int = -1): js.Array[Any] = {
+      val parsedPath                = JPath.parsePath(path)
+      val proposals: Seq[Ast.Value] = JsonSchema.propose(this.res, valueValue, parsedPath, maxDepth)
+      val jsProposals               = proposals.map(v => fromValue(v))
+      val res                       = js.Array(jsProposals: _*)
+      res
+    }
+
+    private lazy val formatsByPath: Map[String, js.Array[String]] =
+      res.flatten
+        .flatMap { r =>
+          r match {
+            case sov: SchemaObjectValidation =>
+              sov.types.flatMap {
+                case sv: TStringValidation =>
+                  sv.format
+                    .map { case (fmt, _) => Seq((r.path, fmt.name)) }
+                    .getOrElse(Seq.empty)
+                case _                     =>
+                  Seq.empty
+              }
+            case _                           =>
+              Seq.empty
+          }
+        }
+        .groupBy(_._1)
+        .map { t =>
+          t._1.format -> t._2.map(_._2).toJSArray
+        }
+
+    @JSExport
+    def getFormats(path: String): js.Array[String] = formatsByPath.getOrElse(path, js.Array())
+
   }
 
   @JSExport
@@ -96,38 +136,6 @@ object JsonSchemaJsFacade {
     val v: Ast.Value = toValue(value)
     val res          = schemaVal.validate(v)
     new JsValidationResult(s, schema, v, value, res)
-  }
-
-  @JSExport
-  def propose(validationResult: JsValidationResult, path: String, maxDepth: Int = -1): js.Array[Any] = {
-    val parsedPath                = JPath.parsePath(path)
-    val v: Ast.Value              = validationResult.valueValue
-    val proposals: Seq[Ast.Value] = JsonSchema.propose(validationResult.res, v, parsedPath, maxDepth)
-    val jsProposals               = proposals.map(v => fromValue(v))
-    val res                       = js.Array(jsProposals: _*)
-    res
-  }
-
-  @JSExport
-  def getFormats(validationResult: JsValidationResult, path: String): js.Array[String] = {
-    val parsedPath                                = JPath.parsePath(path)
-    val filtered: Seq[Schema2020_12.StringFormat] = validationResult.res.flatten
-      .filter(_.path == parsedPath)
-      .flatMap {
-        case sov: SchemaObjectValidation =>
-          sov.types.flatMap {
-            case sv: TStringValidation =>
-              sv.format
-                .map { case (fmt, _) => Seq(fmt) }
-                .getOrElse(Seq.empty)
-            case _                     =>
-              Seq.empty
-          }
-        case _                           =>
-          Seq.empty
-      }
-    val names                                     = filtered.map(_.name)
-    js.Array(names: _*)
   }
 
   @JSExportAll
