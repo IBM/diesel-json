@@ -35,9 +35,24 @@ export interface JsValidationResult {
   readonly res: any;
 }
 
+export function parseValue(value: string): any {
+  // @ts-ignore
+  return JsonSchemaJsFacade.parseValue(value);
+}
+
+export function stringifyValue(value: any): string {
+  // @ts-ignore
+  return JsonSchemaJsFacade.stringifyValue(value);
+}
+
 export function validate(schema: any, value: any): JsValidationResult {
   // @ts-ignore
   return JsonSchemaJsFacade.validate(schema, value);
+}
+
+export function toJsonValue(value: any): any {
+  // @ts-ignore
+  return JsonSchemaJsFacade.toJsonValue(value);
 }
 
 export function getErrors(
@@ -62,10 +77,10 @@ export interface JsRenderer {
 }
 
 export function getRenderers(
-    res: JsValidationResult
+  res: JsValidationResult,
 ): ReadonlyMap<string, JsRenderer | undefined> {
   // @ts-ignore
-  return JsonSchemaJsFacade.getRenderers(res)
+  return JsonSchemaJsFacade.getRenderers(res);
 }
 
 export function getFormats(

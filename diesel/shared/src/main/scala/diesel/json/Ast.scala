@@ -62,7 +62,7 @@ object Ast {
 
     def asString: Option[String] = convert[Str].map(_.v)
     def asInt: Option[Int]       = asAstNumber.flatMap(v => Try(v.v.toInt).toOption)
-    def asDouble: Option[Double] = asAstNumber.map(_.v)
+    def asDouble: Option[Double] = asAstNumber.flatMap(v => Try(v.v.toDouble).toOption)
 
     final def equalsIgnorePos(that: Value): Boolean =
       this.clearPosition == that.clearPosition
@@ -105,7 +105,7 @@ object Ast {
     override def stringify: String = s"[${elems.map(_.stringify).mkString(",")}]"
   }
 
-  case class Number(position: Position, v: Double) extends Value {
+  case class Number(position: Position, v: String) extends Value {
     override def clearPosition: Value = this.copy(position = Position.zero)
     override def stringify: String    = v.toString
   }
@@ -150,7 +150,7 @@ object Ast {
       Ast.Array(Position.zero, items)
     def array(item: Ast.Value, items: Ast.Value*): Ast.Array             =
       array(Seq(item) ++ items)
-    def num(value: Double): Ast.Number                                   =
+    def num(value: String): Ast.Number                                   =
       Ast.Number(Position.zero, value)
     def bool(value: Boolean): Ast.Bool                                   =
       Ast.Bool(Position.zero, value)
@@ -158,7 +158,7 @@ object Ast {
       Ast.Str(Position.zero, value)
 
     object Implicits {
-      implicit def numToNum(x: Double): Ast.Number = num(x)
+      implicit def numToNum(x: String): Ast.Number = num(x)
 
       implicit def boolToBool(x: Boolean): Ast.Bool = bool(x)
 
@@ -174,7 +174,7 @@ object Ast {
     val astBool: Ast.Bool     = bool(true)
     val astObject: Ast.Object = obj(Seq.empty)
     val astStr: Ast.Str       = str("")
-    val astNumber: Ast.Number = num(0)
+    val astNumber: Ast.Number = num("0")
     val astArray: Ast.Array   = array(Seq.empty)
     val astNull: Ast.Null     = nullValue
 

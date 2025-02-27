@@ -39,15 +39,19 @@ class JsonTest extends AstTestFunSuite {
   }
 
   testAst("123") {
-    Number(Position(0, 3), 123)
+    Number(Position(0, 3), "123")
+  }
+
+  testAst("9999999999999999") {
+    Number(Position(0, 16), "9999999999999999")
   }
 
   testAst("[1]") {
-    Array(Position(0, 3), Seq(Number(Position(1, 1), 1)))
+    Array(Position(0, 3), Seq(Number(Position(1, 1), "1")))
   }
 
   testAst("[1, true]") {
-    Array(Position(0, 9), Seq(Number(Position(1, 1), 1), Bool(Position(4, 4), v = true)))
+    Array(Position(0, 9), Seq(Number(Position(1, 1), "1"), Bool(Position(4, 4), v = true)))
   }
 
   testAst("[]") {
@@ -62,7 +66,7 @@ class JsonTest extends AstTestFunSuite {
     Object(
       Position(0, 14),
       Seq(
-        Attribute(Position(2, 10), AttrName(Position(2, 5), "foo"), Number(Position(9, 3), 123))
+        Attribute(Position(2, 10), AttrName(Position(2, 5), "foo"), Number(Position(9, 3), "123"))
       )
     )
   }
@@ -77,9 +81,9 @@ class JsonTest extends AstTestFunSuite {
           Array(
             Position(9, 9),
             Seq(
-              Number(Position(10, 1), 1),
-              Number(Position(13, 1), 2),
-              Number(Position(16, 1), 3)
+              Number(Position(10, 1), "1"),
+              Number(Position(13, 1), "2"),
+              Number(Position(16, 1), "3")
             )
           )
         )

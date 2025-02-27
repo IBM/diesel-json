@@ -21,8 +21,6 @@ import diesel._
 import diesel.json.Ast._
 import diesel.json.Styles._
 
-import scala.util.Try
-
 object Json extends Dsl {
 
   sealed trait JsonParseResult
@@ -77,15 +75,15 @@ object Json extends Dsl {
     }
   )
 
-  val numberDefaultValue: Number = Number(Position(0, 0), 0)
+  val numberDefaultValue: Number = Number(Position(0, 0), "0")
 
   val number: Concept[Number] = concept(
     "-?(?:0|[1-9]\\d*)(?:\\.\\d+)?(?:[eE][+-]?\\d+)?".r,
     numberDefaultValue,
     Some(value)
-  ).valueToString((n: Number) => "%1.0f" format n.v) map { (c, t) =>
+  ) map { (c, t) =>
     c.setStyle(JNumber)
-    Number(Position(c), Try(t.text.toDouble).getOrElse(0))
+    Number(Position(c), t.text)
   }
 
   val dblQuotedString: Concept[String] = concept(

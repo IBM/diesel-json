@@ -18,8 +18,7 @@ package diesel.json.jsonschema.facade
 
 import diesel.{GenericTree, Marker}
 import diesel.facade.{DieselParserFacade, MarkerPostProcessor}
-import diesel.json.{Ast, Json, JsonCompletion}
-import diesel.json.jsonschema.JsValue.{fromValue, toValue}
+import diesel.json.{Ast, Json}
 import diesel.json.jsonschema._
 
 import scala.scalajs.js
@@ -53,11 +52,10 @@ object JsonSchemaJsFacade {
     r => PredictContext(markerPostProcessor = Some(mpp))
 
   @JSExport
-  def getJsonParser(schema: Any): DieselParserFacade = {
-    val s: Ast.Value            = toValue(schema)
-    val schemaVal               = JsonSchema.parse(s, new JsonSchemaParserContext(s))
-    val completionConfiguration = JsonCompletion.completionConfiguration(schemaVal)
-    val markerPostProcessor     = new JsonMarkerPostProcessor(schemaVal)
+  def getJsonParser(schema: Ast.Value): DieselParserFacade = {
+    val schemaVal           = JsonSchema.parse(schema, new JsonSchemaParserContext(schema))
+//    val completionConfiguration = JsonCompletion.completionConfiguration(schemaVal)
+    val markerPostProcessor = new JsonMarkerPostProcessor(schemaVal)
     new DieselParserFacade(
       Json,
       Some(parseContextFactory(markerPostProcessor)),
@@ -76,10 +74,8 @@ object JsonSchemaJsFacade {
 
   @JSExportAll
   class JsValidationResult(
-    val schemaValue: Ast.Value,
-    val schema: Any,
-    val valueValue: Ast.Value,
-    val value: Any,
+    val schema: Ast.Value,
+    val value: Ast.Value,
     val res: JsonSchemaValidationResult
   )
 
@@ -90,21 +86,34 @@ object JsonSchemaJsFacade {
   }
 
   @JSExport
-  def validate(schema: Any, value: Any): JsValidationResult = {
-    val s: Ast.Value = toValue(schema)
-    val schemaVal    = JsonSchema.parse(s, new JsonSchemaParserContext(s))
-    val v: Ast.Value = toValue(value)
-    val res          = schemaVal.validate(v)
-    new JsValidationResult(s, schema, v, value, res)
+  def validate(schema: Ast.Value, value: Ast.Value): JsValidationResult = {
+    val schemaVal = JsonSchema.parse(schema, new JsonSchemaParserContext(schema))
+    val res       = schemaVal.validate(value)
+    new JsValidationResult(schema, value, res)
   }
 
   @JSExport
-  def propose(validationResult: JsValidationResult, path: String, maxDepth: Int = -1): js.Array[Any] = {
+  def parseValue(value: String): Ast.Value = {
+    Json.parse(value) match {
+      case Json.JPRError(err)    => {
+        throw new RuntimeException(err);
+      }
+      case Json.JPRSuccess(_, v) => v
+    }
+  }
+
+  @JSExport
+  def toJsonValue(value: Ast.Value): js.Any = JsonValue.astToJsonValue(value)
+
+  @JSExport
+  def stringifyValue(value: Ast.Value): String = value.stringify
+
+  @JSExport
+  def propose(validationResult: JsValidationResult, path: String, maxDepth: Int = -1): js.Array[Ast.Value] = {
     val parsedPath                = JPath.parsePath(path)
-    val v: Ast.Value              = validationResult.valueValue
+    val v: Ast.Value              = validationResult.value
     val proposals: Seq[Ast.Value] = JsonSchema.propose(validationResult.res, v, parsedPath, maxDepth)
-    val jsProposals               = proposals.map(v => fromValue(v))
-    val res                       = js.Array(jsProposals: _*)
+    val res                       = js.Array(proposals: _*)
     res
   }
 
@@ -133,7 +142,7 @@ object JsonSchemaJsFacade {
   @JSExportAll
   class JsRenderer(
     val key: String,
-    val schemaValue: Any
+    val schemaValue: Ast.Value
   )
 
   @JSExport
@@ -142,8 +151,7 @@ object JsonSchemaJsFacade {
       .flatten
       .flatMap { res =>
         res.renderer.map { r =>
-          val schemaValue = fromValue(r.schemaValue)
-          res.path.format -> new JsRenderer(r.key, schemaValue)
+          res.path.format -> new JsRenderer(r.key, r.schemaValue)
         }
       }
       .toMap
