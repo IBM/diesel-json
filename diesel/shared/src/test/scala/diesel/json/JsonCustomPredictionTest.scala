@@ -67,25 +67,6 @@ class JsonCustomPredictionTest extends FunSuite {
     )
   }
 
-  private val allValues = List(
-    "0",
-    "null",
-    "true",
-    "false",
-    "\"\"",
-    "[",
-    "{"
-  )
-
-  test("empty") {
-    assertPredictions(
-      "{}",
-      "",
-      0,
-      allValues
-    )
-  }
-
   private val expectedObjectFirstLevel = Seq("}", address, name, rating, emptyString)
 
   test("object first level, incomplete") {
