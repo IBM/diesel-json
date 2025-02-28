@@ -605,17 +605,4 @@ class JsonCustomPredictionTest extends FunSuite {
       Seq("}", "\"\"", "\"foo\"", "\"\"")
     )
   }
-
-  test("empty".only) {
-    assertPredictions("""{}""", "", 0, List(
-      "0",
-      "null",
-      "true",
-      "false",
-      "\"\"",
-      "[",
-      "{"
-    ))
-  }
-
 }

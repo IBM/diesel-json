@@ -270,7 +270,7 @@ class JsonSchemaJsFacadeTest extends FunSuite {
     assertEquals(v.value, "123")
   }
 
-  test("using facade parser".only) {
+  test("using facade parser") {
     val schema = JsonSchemaJsFacade.parseValue("{}")
     val parser = JsonSchemaJsFacade.getJsonParser(schema)
     val res = parser.predict(js.Dynamic.literal(
