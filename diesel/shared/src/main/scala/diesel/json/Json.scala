@@ -81,7 +81,7 @@ object Json extends Dsl {
     "-?(?:0|[1-9]\\d*)(?:\\.\\d+)?(?:[eE][+-]?\\d+)?".r,
     numberDefaultValue,
     Some(value)
-  ) map { (c, t) =>
+  ).valueToString((n: Number) => n.v) map { (c, t) =>
     c.setStyle(JNumber)
     Number(Position(c), t.text)
   }

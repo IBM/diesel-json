@@ -107,7 +107,7 @@ object Ast {
 
   case class Number(position: Position, v: String) extends Value {
     override def clearPosition: Value = this.copy(position = Position.zero)
-    override def stringify: String    = v.toString
+    override def stringify: String    = v
   }
 
   case class Str(position: Position, v: String) extends Value {
@@ -158,8 +158,6 @@ object Ast {
       Ast.Str(Position.zero, value)
 
     object Implicits {
-      implicit def numToNum(x: String): Ast.Number = num(x)
-
       implicit def boolToBool(x: Boolean): Ast.Bool = bool(x)
 
       implicit def strToStr(x: String): Ast.Str = str(x)

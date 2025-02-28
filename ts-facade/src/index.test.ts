@@ -24,9 +24,10 @@ import {
   getJsonParser,
   getRenderers,
   toJsonValue,
+  JsonValue,
 } from './index';
 
-function parseFromNative(value: any): any {
+function parseFromNative(value: any): JsonValue {
   const s = JSON.stringify(value);
   return parseValue(s);
 }
@@ -129,7 +130,7 @@ function withProposals(
   v: any,
   path: string,
   maxDepth: number,
-  f: (proposals: ReadonlyArray<any>) => void,
+  f: (proposals: ReadonlyArray<JsonValue>) => void,
 ) {
   const schema = parseFromNative(s);
   const value = parseFromNative(v);
@@ -154,6 +155,16 @@ describe('propose', () => {
         expect(stringifyValue(proposals[0])).toBe('""');
       },
     );
+  });
+
+  test('convert proposal to JsonValue', () => {
+    withProposals({type:'string'}, 'foo', '', -1, proposals => {
+      expect(proposals.length).toBe(1);
+      const jv: JsonValue = proposals[0];
+      const jsv = toJsonValue(jv);
+      expect(jsv.tag).toBe("jv-string");
+      expect(jsv.value).toBe("");
+    })
   });
 
   const objectSchemaFooBar = {
@@ -183,6 +194,21 @@ describe('propose', () => {
       );
     });
   });
+  test('using facade parser', () => {
+    const schema = parseFromNative({
+      type: 'object',
+      properties: {
+        foo: {
+          type: 'string',
+        },
+      },
+    })
+    const parser = getJsonParser(schema);
+    const res = parser.predict({ text: '{}', offset: 1 });
+    expect(res.success).toBe(true);
+    expect(res.error).toBeUndefined;
+    expect(res.proposals.map(p => p.text)).toEqual(["}", "\"foo\"", "\"\""])
+  })
 });
 
 describe('parse', () => {
@@ -216,7 +242,7 @@ describe('parse', () => {
   });
   test('parser should predict', () => {
     const predictRequest = { text: '', offset: 0 };
-    const res = getJsonParser(parseFromNative({})).predict(predictRequest);
+    const res = getJsonParser(parseValue("{}")).predict(predictRequest);
     expect(res.error).toBeUndefined();
     expect(res.success).toBe(true);
     expect(res.proposals.length).toEqual(7);

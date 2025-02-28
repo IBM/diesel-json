@@ -16,27 +16,26 @@
 
 package diesel.json.jsonschema
 
-import diesel.facade.ParseRequest
-import diesel.json.Ast
+import diesel.facade.{ParseRequest, PredictRequest}
 import diesel.json.Ast.Builder.num
 import diesel.json.Ast.Constants.astNull
 import diesel.json.i18n.I18n
-import diesel.json.jsonschema.facade.JsonSchemaJsFacade
+import diesel.json.jsonschema.facade.{JsonSchemaJsFacade, JsonValue}
 import munit.FunSuite
 
 import scala.scalajs.js
 
 class JsonSchemaJsFacadeTest extends FunSuite {
 
-  private def parse(json: String): Ast.Value = JsonSchemaJsFacade.parseValue(json)
+  private def parse(json: String): JsonValue = JsonSchemaJsFacade.parseValue(json)
 
-  private def doValidate(schema: Ast.Value, value: Ast.Value): js.Array[JsonSchemaJsFacade.JsValidationError] = {
+  private def doValidate(schema: JsonValue, value: JsonValue): js.Array[JsonSchemaJsFacade.JsValidationError] = {
     JsonSchemaJsFacade.getErrors(
       JsonSchemaJsFacade.validate(schema, value)
     )
   }
 
-  private def doPropose(schema: Ast.Value, value: Ast.Value, path: String): js.Array[Ast.Value] = {
+  private def doPropose(schema: JsonValue, value: JsonValue, path: String): js.Array[JsonValue] = {
     val res = JsonSchemaJsFacade.validate(schema, value)
     JsonSchemaJsFacade.propose(res, path)
   }
@@ -110,7 +109,7 @@ class JsonSchemaJsFacadeTest extends FunSuite {
     val value     = parse("123")
     val proposals = doPropose(schema, value, "/")
     assert(proposals.size == 1)
-    val s         = proposals.head.asAstStr.get.v
+    val s         = proposals.head.astValue.asAstStr.get.v
     assert(s == "")
   }
 
@@ -128,7 +127,7 @@ class JsonSchemaJsFacadeTest extends FunSuite {
     val value     = parse("{}")
     val proposals = doPropose(schema, value, "/")
     assert(proposals.size == 1)
-    val proposal  = proposals.head.asAstObject.get
+    val proposal  = proposals.head.astValue.asAstObject.get
     assert(proposal.attributes.length == 1)
     val fooAttr   = proposal.attributes.head
     assertEquals(fooAttr.name.s, "foo")
@@ -149,7 +148,7 @@ class JsonSchemaJsFacadeTest extends FunSuite {
     val value     = parse(""" { "foo": "bar" }""")
     val proposals = doPropose(schema, value, "/foo")
     assert(proposals.size == 1)
-    val proposal  = proposals.head.asAstStr.get
+    val proposal  = proposals.head.astValue.asAstStr.get
     assert(proposal.v == "")
   }
 
@@ -159,8 +158,8 @@ class JsonSchemaJsFacadeTest extends FunSuite {
     val ps     = doPropose(schema, value, "/")
     ps.foreach(x => println("X " + x))
     assert(ps.length == 2)
-    assert(ps(0).asAstArray.get.elems.isEmpty)
-    assert(ps(1) == astNull)
+    assert(ps(0).astValue.asAstArray.get.elems.isEmpty)
+    assert(ps(1).astValue == astNull)
   }
 
   test("set lang") {
@@ -236,45 +235,80 @@ class JsonSchemaJsFacadeTest extends FunSuite {
     assertEquals(renderers.size, 2)
     assertEquals(renderers.get("foo").get.key, "RenderFoo")
     assertEquals(
-      renderers.get("foo").get.schemaValue.clearPosition,
+      renderers.get("foo").get.schemaValue,
       parse("""{
               |  "type": "string",
               |  "renderer": "RenderFoo"
-              |}""".stripMargin).clearPosition
+              |}""".stripMargin)
     )
     assertEquals(renderers.get("bar").get.key, "RenderBar")
     assertEquals(
-      renderers.get("bar").get.schemaValue.clearPosition,
+      renderers.get("bar").get.schemaValue,
       parse(
         """{
           |  "type": "string",
           |  "renderer": "RenderBar"
           |}
           |""".stripMargin
-      ).clearPosition
+      )
     )
   }
 
   test("parse value") {
-    val parsed = JsonSchemaJsFacade.parseValue("123").clearPosition
+    val parsed = JsonSchemaJsFacade.parseValue("123").astValue.clearPosition
     assertEquals(parsed, num("123"))
   }
 
   test("stringify value") {
-    val s = JsonSchemaJsFacade.stringifyValue(num("123"))
+    val s = JsonSchemaJsFacade.stringifyValue(JsonValue(num("123")))
     assertEquals(s, "123")
   }
 
   test("to json value") {
-    val v = JsonSchemaJsFacade.toJsonValue(num("123")).asInstanceOf[JsNumber]
+    val v = JsonSchemaJsFacade.toJsonValue(JsonValue(num("123"))).asInstanceOf[JsNumber]
     assertEquals(v.tag, "jv-number")
     assertEquals(v.value, "123")
+  }
+
+  test("using facade parser".only) {
+    val schema = JsonSchemaJsFacade.parseValue("{}")
+    val parser = JsonSchemaJsFacade.getJsonParser(schema)
+    val res = parser.predict(js.Dynamic.literal(
+      "text" -> "",
+      "offset" -> 0
+    ).asInstanceOf[PredictRequest])
+    assertEquals(res.error, js.undefined)
+    assertEquals(
+      res.proposals.map(_.text).toSeq,
+      Seq("}", "\"\"", "\"foo\"")
+    )
+  }
+
+  test("using facade parser 2") {
+    val schema = JsonSchemaJsFacade.parseValue("""{
+                                                 |      "type": "object",
+                                                 |      "properties": {
+                                                 |        "foo": {
+                                                 |          "type": "string",
+                                                 |        },
+                                                 |      },
+                                                 |}""".stripMargin)
+    val parser = JsonSchemaJsFacade.getJsonParser(schema)
+    val res    = parser.predict(js.Dynamic.literal(
+      "text"   -> "{}",
+      "offset" -> 1
+    ).asInstanceOf[PredictRequest])
+    assertEquals(res.error, js.undefined)
+    assertEquals(
+      res.proposals.map(_.text).toSeq,
+      Seq("}", "\"\"", "\"foo\"")
+    )
   }
 
 }
 
 @js.native
 trait JsNumber extends js.Object {
-  val tag: String = js.native
+  val tag: String   = js.native
   val value: String = js.native
 }

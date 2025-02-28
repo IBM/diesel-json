@@ -590,4 +590,32 @@ class JsonCustomPredictionTest extends FunSuite {
     )
   }
 
+  test("object props") {
+    assertPredictions(
+      """{
+        |      "type": "object",
+        |      "properties": {
+        |        "foo": {
+        |          "type": "string",
+        |        },
+        |      },
+        |}""".stripMargin,
+      "{}",
+      offset = 1,
+      Seq("}", "\"\"", "\"foo\"", "\"\"")
+    )
+  }
+
+  test("empty".only) {
+    assertPredictions("""{}""", "", 0, List(
+      "0",
+      "null",
+      "true",
+      "false",
+      "\"\"",
+      "[",
+      "{"
+    ))
+  }
+
 }
