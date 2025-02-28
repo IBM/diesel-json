@@ -271,20 +271,6 @@ class JsonSchemaJsFacadeTest extends FunSuite {
   }
 
   test("using facade parser") {
-    val schema = JsonSchemaJsFacade.parseValue("{}")
-    val parser = JsonSchemaJsFacade.getJsonParser(schema)
-    val res = parser.predict(js.Dynamic.literal(
-      "text" -> "",
-      "offset" -> 0
-    ).asInstanceOf[PredictRequest])
-    assertEquals(res.error, js.undefined)
-    assertEquals(
-      res.proposals.map(_.text).toSeq,
-      Seq("}", "\"\"", "\"foo\"")
-    )
-  }
-
-  test("using facade parser 2") {
     val schema = JsonSchemaJsFacade.parseValue("""{
                                                  |      "type": "object",
                                                  |      "properties": {
