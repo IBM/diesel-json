@@ -241,10 +241,17 @@ describe('parse', () => {
     expect(m0.getMessage('en')).toBe('Invalid type: expected string');
   });
   test('parser should predict', () => {
-    const predictRequest = { text: '', offset: 0 };
-    const res = getJsonParser(parseValue("{}")).predict(predictRequest);
+    const predictRequest = { text: '{}', offset: 1 };
+    const res = getJsonParser(parseFromNative({
+      type: 'object',
+      properties: {
+        foo: {
+          type: 'string',
+        },
+      },
+    })).predict(predictRequest);
     expect(res.error).toBeUndefined();
     expect(res.success).toBe(true);
-    expect(res.proposals.length).toEqual(7);
+    expect(res.proposals.map(p => p.text)).toEqual(["}", "\"foo\"", "\"\""]);
   });
 });
