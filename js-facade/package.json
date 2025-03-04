@@ -1,6 +1,6 @@
 {
   "name": "@diesel-parser/json-schema-facade-js",
-  "version": "0.11.0",
+  "version": "0.12.0",
   "description": "JS facade for diesel JSON Schema",
   "author": "Rémi Van Keisbelck <remi@rvkb.com>",
   "license": "Apache-2.0",
