@@ -233,7 +233,7 @@ class JsonSchemaProposeTest extends FunSuite {
       Examples.EnumArray,
       "[]",
       "/0",
-      Seq("FOO", "BAR")
+      Seq(str("FOO"), str("BAR"))
     )
   }
 
@@ -345,7 +345,7 @@ class JsonSchemaProposeTest extends FunSuite {
       Examples.Polymorphism,
       """{"what": ""}""",
       "/what",
-      Seq("schema.animal.Lion", "schema.animal.Elephant")
+      Seq(str("schema.animal.Lion"), str("schema.animal.Elephant"))
     )
   }
 
@@ -473,7 +473,7 @@ class JsonSchemaProposeTest extends FunSuite {
       Examples.EnumArrayWithoutNull,
       """[]""",
       "/0",
-      Seq("FOO", "BAR")
+      Seq(str("FOO"), str("BAR"))
     )
   }
 
@@ -482,7 +482,7 @@ class JsonSchemaProposeTest extends FunSuite {
       Examples.EnumArrayWithoutNull,
       """["FOO", null]""",
       "/1",
-      Seq("FOO", "BAR")
+      Seq(str("FOO"), str("BAR"))
     )
   }
 
