@@ -32,13 +32,13 @@ class JPathTest extends FunSuite {
   test("attr") {
     val x = parseJson("""{"foo": 1}""")
     val v = JPath.parsePath("/foo").resolve(x)
-    assert(v.get.asInstanceOf[Ast.Number].v == 1)
+    assert(v.get.asInstanceOf[Ast.Number].v == "1")
   }
 
   test("array") {
     val x = parseJson("""[1, 2, 3]""")
     val v = "/1".resolve(x)
-    assert(v.get.asInstanceOf[Ast.Number].v == 2)
+    assert(v.get.asInstanceOf[Ast.Number].v == "2")
   }
 
   test("array attr") {
@@ -96,7 +96,7 @@ class JPathTest extends FunSuite {
     )
 
     assert(
-      "/1/1/1".resolve(x).flatMap(_.asAstNumber).exists(_.v == 2)
+      "/1/1/1".resolve(x).flatMap(_.asAstNumber).exists(_.v == "2")
     )
   }
 

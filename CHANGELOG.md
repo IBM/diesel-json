@@ -1,5 +1,13 @@
 # Changelog
 
+## v0.11.0 (05/02/2024)
+
+#### closed
+
+- [**closed**] Bump diesel-core to 0.18.0 [#11](https://github.com/IBM/diesel-json/pull/11)
+
+---
+
 ## v0.10.0 (01/06/2023)
 
 #### closed

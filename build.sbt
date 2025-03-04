@@ -3,10 +3,10 @@ import sbtcrossproject.CrossPlugin.autoImport.crossProject
 
 import scala.sys.process._
 
-val scalaVersion_ = "2.13.10"
+val scalaVersion_ = "2.13.16"
 
 lazy val copyrightSettings = Seq(
-  startYear := Some(2018),
+  startYear        := Some(2018),
   organizationName := "The Diesel Authors",
   licenses += ("Apache-2.0", new URL("https://www.apache.org/licenses/LICENSE-2.0.txt"))
 )
@@ -20,8 +20,8 @@ addCommandAlias("lintFix", "headerCreateAll;scalafixAll;fmt")
 
 inThisBuild(
   List(
-    organization := "com.ibm.cloud.diesel",
-    scalaVersion := scalaVersion_,
+    organization  := "com.ibm.cloud.diesel",
+    scalaVersion  := scalaVersion_,
     versionScheme := Some("semver-spec")
   )
 )
@@ -31,7 +31,7 @@ lazy val root: Project = project
   .aggregate(dieselJVM, dieselJS, jsFacade)
   .settings(copyrightSettings)
   .settings(
-    name := "diesel-json-schema-root",
+    name         := "diesel-json-schema-root",
     scalaVersion := scalaVersion_
     // publish / skip := true
   )
@@ -42,16 +42,16 @@ lazy val diesel = crossProject(JSPlatform, JVMPlatform)
   .enablePlugins(I18nPlugin)
   .settings(copyrightSettings)
   .settings(
-    name := "diesel-json-schema",
-    scalaVersion := scalaVersion_,
-    i18nDir := file("./diesel/i18n"),
+    name          := "diesel-json-schema",
+    scalaVersion  := scalaVersion_,
+    i18nDir       := file("./diesel/i18n"),
     i18nClassName := "diesel.json.i18n.I18nFiles"
   )
   .settings(
     libraryDependencies ++= Seq(
       "com.ibm.cloud.diesel" %%% "diesel-i18n"     % Dependencies.dieselI18nVersion,
       "com.ibm.cloud.diesel" %%% "diesel-core"     % Dependencies.dieselVersion,
-      "io.github.cquiroz"    %%% "scala-java-time" % "2.3.0"
+      "io.github.cquiroz"    %%% "scala-java-time" % "2.6.0"
     )
   )
   .settings(
@@ -64,18 +64,16 @@ lazy val diesel = crossProject(JSPlatform, JVMPlatform)
       "-Wunused:imports"
     ),
     libraryDependencies ++= Seq(
-      "org.scalameta" %%% "munit" % "0.7.29" % Test
+      "org.scalameta" %%% "munit" % "1.0.2" % Test
     )
   )
   .settings(
-    Test / fork := false,
+    Test / fork        := false,
     Test / logBuffered := false,
     // see https://github.com/scalameta/munit/blob/main/junit-interface/src/main/java/munit/internal/junitinterface/JUnitRunner.java
     Test / testOptions += Tests.Argument("+l", "--summary=1")
   )
   .settings(
-    addCompilerPlugin(scalafixSemanticdb),
-    ThisBuild / scalafixScalaBinaryVersion := CrossVersion.binaryScalaVersion(scalaVersion.value),
     ThisBuild / semanticdbEnabled := true,
     ThisBuild / semanticdbVersion := scalafixSemanticdb.revision
   )
@@ -86,7 +84,7 @@ lazy val jsFacade = project
   .settings(copyrightSettings)
   .settings(
     libraryDependencies ++= Seq(
-      "org.scalameta" %%% "munit" % "0.7.29" % Test
+      "org.scalameta" %%% "munit" % "1.0.2" % Test
     ),
     // see https://github.com/scalameta/munit/blob/main/junit-interface/src/main/java/munit/internal/junitinterface/JUnitRunner.java
     Test / testOptions += Tests.Argument("+l", "--summary=1")

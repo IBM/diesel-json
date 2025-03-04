@@ -14,19 +14,51 @@
  * limitations under the License.
  */
 
-import {validate, getErrors, JsValidationError, propose, getJsonParser, getRenderers} from './index';
+import {
+  parseValue,
+  stringifyValue,
+  validate,
+  getErrors,
+  JsValidationError,
+  propose,
+  getJsonParser,
+  getRenderers,
+  toJsonValue,
+  JsonValue,
+} from './index';
+
+function parseFromNative(value: any): JsonValue {
+  const s = JSON.stringify(value);
+  return parseValue(s);
+}
 
 function withErrors(
-  schema: any,
-  value: any,
+  s: any,
+  v: any,
   f: (errors: ReadonlyArray<JsValidationError>) => void,
 ) {
+  const schema = parseFromNative(s);
+  const value = parseFromNative(v);
   const res = validate(schema, value);
   const errors = getErrors(res);
   expect(schema).toBe(res.schema);
   expect(value).toBe(res.value);
   f(errors);
 }
+
+describe('parse / stringify', () => {
+  test('roundtrip', () => {
+    const parsed = parseValue('123');
+    const stringified = stringifyValue(parsed);
+    expect(stringified).toBe('123');
+  });
+
+  test('to json value', () => {
+    const parsed = parseValue('123');
+    const jv = toJsonValue(parsed);
+    expect(jv).toEqual({ tag: 'jv-number', value: '123' });
+  });
+});
 
 describe('validate', () => {
   test('string ok', () => {
@@ -35,7 +67,9 @@ describe('validate', () => {
         type: 'string',
       },
       'toto',
-      (errors) => expect(errors.length).toBe(0),
+      (errors) => {
+        expect(errors.length).toBe(0);
+      },
     );
   });
   test('string ko', () => {
@@ -54,51 +88,52 @@ describe('validate', () => {
 });
 
 describe('renderers', function () {
-  test("get renderers 1", () => {
-    const schema = {
-      type: "string",
-      renderer: "Yalla"
-    };
-    const res = validate(schema, "Yo");
+  test('get renderers 1', () => {
+    const schema = parseFromNative({
+      type: 'string',
+      renderer: 'Yalla',
+    });
+    const res = validate(schema, parseFromNative('Yo'));
     const renderers = getRenderers(res);
     expect(renderers.size).toBe(1);
-    const r = renderers.get("");
+    const r = renderers.get('');
     expect(r).toBeDefined();
-    expect(r?.key).toBe("Yalla");
+    expect(r?.key).toBe('Yalla');
     expect(r?.schemaValue).toEqual(schema);
-    expect(renderers.get("yolo")).toBeUndefined();
+    expect(renderers.get('yolo')).toBeUndefined();
   });
 
-  test("get renderers 2", () => {
+  test('get renderers 2', () => {
     const renderer = {
-      key: "Yalla",
-      foo: 123
+      key: 'Yalla',
+      foo: 123,
     };
 
-    const schema = {
-      type: "string",
+    const schema = parseFromNative({
+      type: 'string',
       renderer,
-    };
+    });
 
-    const res = validate(schema, "Yo");
+    const res = validate(schema, parseFromNative('Yo'));
     const renderers = getRenderers(res);
     expect(renderers.size).toBe(1);
-    const r = renderers.get("");
+    const r = renderers.get('');
     expect(r).toBeDefined();
-    expect(r?.key).toBe("Yalla");
+    expect(r?.key).toBe('Yalla');
     expect(r?.schemaValue).toEqual(schema);
-    expect(renderers.get("yolo")).toBeUndefined();
-  })
-
+    expect(renderers.get('yolo')).toBeUndefined();
+  });
 });
 
 function withProposals(
-  schema: any,
-  value: any,
+  s: any,
+  v: any,
   path: string,
   maxDepth: number,
-  f: (proposals: ReadonlyArray<any>) => void,
+  f: (proposals: ReadonlyArray<JsonValue>) => void,
 ) {
+  const schema = parseFromNative(s);
+  const value = parseFromNative(v);
   const res = validate(schema, value);
   expect(schema).toBe(res.schema);
   expect(value).toBe(res.value);
@@ -117,9 +152,19 @@ describe('propose', () => {
       -1,
       (proposals) => {
         expect(proposals.length).toBe(1);
-        expect(proposals[0]).toBe('');
+        expect(stringifyValue(proposals[0])).toBe('""');
       },
     );
+  });
+
+  test('convert proposal to JsonValue', () => {
+    withProposals({type:'string'}, 'foo', '', -1, proposals => {
+      expect(proposals.length).toBe(1);
+      const jv: JsonValue = proposals[0];
+      const jsv = toJsonValue(jv);
+      expect(jsv.tag).toBe("jv-string");
+      expect(jsv.value).toBe("");
+    })
   });
 
   const objectSchemaFooBar = {
@@ -136,49 +181,77 @@ describe('propose', () => {
   test('object depth 1', () => {
     withProposals(objectSchemaFooBar, {}, '', -1, (proposals) => {
       expect(proposals.length).toBe(1);
-      expect(proposals[0]).toEqual({ foo: null, bar: null });
+      expect(stringifyValue(proposals[0])).toEqual(
+        JSON.stringify({ bar: null, foo: null }),
+      );
     });
   });
   test('object depth 2', () => {
     withProposals(objectSchemaFooBar, {}, '', 2, (proposals) => {
       expect(proposals.length).toBe(1);
-      expect(proposals[0]).toEqual({ foo: '', bar: 0 });
+      expect(stringifyValue(proposals[0])).toEqual(
+        JSON.stringify({ bar: 0, foo: '' }),
+      );
     });
   });
+  test('using facade parser', () => {
+    const schema = parseFromNative({
+      type: 'object',
+      properties: {
+        foo: {
+          type: 'string',
+        },
+      },
+    })
+    const parser = getJsonParser(schema);
+    const res = parser.predict({ text: '{}', offset: 1 });
+    expect(res.success).toBe(true);
+    expect(res.error).toBeUndefined;
+    expect(res.proposals.map(p => p.text)).toEqual(["}", "\"foo\"", "\"\""])
+  })
 });
 
 describe('parse', () => {
-  test("parser should be defined", () => {
-    const p = getJsonParser({});
+  test('parser should be defined', () => {
+    const p = getJsonParser(parseFromNative({}));
     expect(p).toBeDefined();
   });
-  test("parser should parse", () => {
-    const parseRequest = { text: "{}" };
-    const res = getJsonParser({}).parse(parseRequest);
+  test('parser should parse', () => {
+    const parseRequest = { text: '{}' };
+    const res = getJsonParser(parseFromNative({})).parse(parseRequest);
     expect(res.error).toBeUndefined();
     expect(res.success).toBe(true);
     expect(res.markers.length).toEqual(0);
     expect(res.styles.length).toEqual(0);
   });
-  test("parser should validate", () => {
-    const parseRequest = { text: "true" };
-    const res = getJsonParser({
-      type: "string"
-    }).parse(parseRequest);
+  test('parser should validate', () => {
+    const parseRequest = { text: 'true' };
+    const res = getJsonParser(
+      parseFromNative({
+        type: 'string',
+      }),
+    ).parse(parseRequest);
     expect(res.error).toBeUndefined();
     expect(res.success).toBe(true);
     expect(res.markers.length).toEqual(1);
     const m0 = res.markers[0];
     expect(m0.offset).toBe(0);
     expect(m0.length).toBe(4);
-    expect(m0.severity).toBe("error");
-    expect(m0.getMessage("en")).toBe("Invalid type: expected string")
+    expect(m0.severity).toBe('error');
+    expect(m0.getMessage('en')).toBe('Invalid type: expected string');
   });
-  test("parser should predict", () => {
-    const predictRequest = { text: "", offset: 0 };
-    const res = getJsonParser({}).predict(predictRequest);
+  test('parser should predict', () => {
+    const predictRequest = { text: '{}', offset: 1 };
+    const res = getJsonParser(parseFromNative({
+      type: 'object',
+      properties: {
+        foo: {
+          type: 'string',
+        },
+      },
+    })).predict(predictRequest);
     expect(res.error).toBeUndefined();
     expect(res.success).toBe(true);
-    expect(res.proposals.length).toEqual(7);
+    expect(res.proposals.map(p => p.text)).toEqual(["}", "\"foo\"", "\"\""]);
   });
 });

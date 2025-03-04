@@ -33,7 +33,15 @@ class JsonPredictionTest extends FunSuite {
     assertEquals(proposals.map(_.replace), expectedPredictions.map(_ => None))
   }
 
-  private val allValues = List("null", "0", "true", "false", "[", "{", "\"\"")
+  private val allValues = List(
+    "0",
+    "null",
+    "true",
+    "false",
+    "\"\"",
+    "[",
+    "{"
+  )
 
   test("empty") {
     assertPredictions(
@@ -47,7 +55,7 @@ class JsonPredictionTest extends FunSuite {
     assertPredictions(
       "{",
       1,
-      Seq("}", "\"\"")
+      Seq("\"\"", "}")
     )
   }
 
@@ -55,7 +63,7 @@ class JsonPredictionTest extends FunSuite {
     assertPredictions(
       "{}",
       1,
-      Seq("}", "\"\"")
+      Seq("\"\"", "}")
     )
   }
 
@@ -63,7 +71,7 @@ class JsonPredictionTest extends FunSuite {
     assertPredictions(
       "{    }",
       3,
-      Seq("}", "\"\"")
+      Seq("\"\"", "}")
     )
   }
 
@@ -111,7 +119,7 @@ class JsonPredictionTest extends FunSuite {
     assertPredictions(
       "[",
       1,
-      "]" :: allValues
+      allValues :+ "]"
     )
   }
 
@@ -119,7 +127,7 @@ class JsonPredictionTest extends FunSuite {
     assertPredictions(
       "[]",
       1,
-      "]" :: allValues
+      allValues :+ "]"
     )
   }
 

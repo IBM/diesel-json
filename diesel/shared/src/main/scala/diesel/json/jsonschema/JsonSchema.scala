@@ -197,7 +197,8 @@ object JsonSchema extends JsonSchemaParser {
                   }
               }
             x.copy(attributes =
-              attrProposals)
+              attrProposals
+            )
           }
         case x @ _         =>
           x
@@ -209,7 +210,7 @@ object JsonSchema extends JsonSchemaParser {
 
 object Schema2020_12 extends JsonSchemaParser {
 
-  private def log(x: Any): Unit = {} //println(x)
+  private def log(x: Any): Unit = {} // println(x)
 
   sealed trait StringFormat {
     val name: String

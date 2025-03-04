@@ -24,6 +24,10 @@ export interface JsValidationError {
   readonly message: string;
 }
 
+export interface JsonValue {
+  readonly astValue: any;
+}
+
 export function setLang(language: string): void {
   // @ts-ignore
   return JsonSchemaJsFacade.setLang(language);
@@ -35,9 +39,24 @@ export interface JsValidationResult {
   readonly res: any;
 }
 
-export function validate(schema: any, value: any): JsValidationResult {
+export function parseValue(value: string): JsonValue {
+  // @ts-ignore
+  return JsonSchemaJsFacade.parseValue(value);
+}
+
+export function stringifyValue(value: JsonValue): string {
+  // @ts-ignore
+  return JsonSchemaJsFacade.stringifyValue(value);
+}
+
+export function validate(schema: JsonValue, value: JsonValue): JsValidationResult {
   // @ts-ignore
   return JsonSchemaJsFacade.validate(schema, value);
+}
+
+export function toJsonValue(value: JsonValue): any {
+  // @ts-ignore
+  return JsonSchemaJsFacade.toJsonValue(value);
 }
 
 export function getErrors(
@@ -51,7 +70,7 @@ export function propose(
   res: JsValidationResult,
   path: string,
   maxDepth = -1,
-): ReadonlyArray<any> {
+): ReadonlyArray<JsonValue> {
   // @ts-ignore
   return JsonSchemaJsFacade.propose(res, path, maxDepth);
 }
@@ -62,10 +81,10 @@ export interface JsRenderer {
 }
 
 export function getRenderers(
-    res: JsValidationResult
+  res: JsValidationResult,
 ): ReadonlyMap<string, JsRenderer | undefined> {
   // @ts-ignore
-  return JsonSchemaJsFacade.getRenderers(res)
+  return JsonSchemaJsFacade.getRenderers(res);
 }
 
 export function getFormats(
@@ -76,6 +95,6 @@ export function getFormats(
   return JsonSchemaJsFacade.getFormats(res, path);
 }
 
-export function getJsonParser(schema: any): DieselParserFacade {
+export function getJsonParser(schema: JsonValue): DieselParserFacade {
   return JsonSchemaJsFacade.getJsonParser(schema) as DieselParserFacade;
 }
