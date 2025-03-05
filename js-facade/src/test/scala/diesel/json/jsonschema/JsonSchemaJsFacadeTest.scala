@@ -156,7 +156,6 @@ class JsonSchemaJsFacadeTest extends FunSuite {
     val schema = parse(Examples.EnumArray)
     val value  = parse("null")
     val ps     = doPropose(schema, value, "/")
-    ps.foreach(x => println("X " + x))
     assert(ps.length == 2)
     assert(ps(0).astValue.asAstArray.get.elems.isEmpty)
     assert(ps(1).astValue == astNull)
@@ -202,10 +201,6 @@ class JsonSchemaJsFacadeTest extends FunSuite {
     assertEquals(renderers.size, 1)
     assertEquals(renderers.get("").get.key, "Yalla")
     val rendererSchema = renderers.get("").get.schemaValue
-    println("1")
-    println(rendererSchema)
-    println("2")
-    println(schema)
     assert(rendererSchema == schema)
   }
 
