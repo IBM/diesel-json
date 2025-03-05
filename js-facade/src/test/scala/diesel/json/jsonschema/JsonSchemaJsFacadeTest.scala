@@ -275,9 +275,9 @@ class JsonSchemaJsFacadeTest extends FunSuite {
                                                  |      "type": "object",
                                                  |      "properties": {
                                                  |        "foo": {
-                                                 |          "type": "string",
-                                                 |        },
-                                                 |      },
+                                                 |          "type": "string"
+                                                 |        }
+                                                 |      }
                                                  |}""".stripMargin)
     val parser = JsonSchemaJsFacade.getJsonParser(schema)
     val res    = parser.predict(js.Dynamic.literal(
@@ -287,7 +287,7 @@ class JsonSchemaJsFacadeTest extends FunSuite {
     assertEquals(res.error, js.undefined)
     assertEquals(
       res.proposals.map(_.text).toSeq,
-      Seq("}", "\"\"", "\"foo\"")
+      Seq("}", "\"foo\"", "\"\"")
     )
   }
 

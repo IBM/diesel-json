@@ -23,31 +23,27 @@ import diesel.json.Styles._
 
 object Json extends Dsl {
 
-  sealed trait JsonParseResult
-  case class JPRError(message: String)                       extends JsonParseResult
-  case class JPRSuccess(tree: GenericTree, value: Ast.Value) extends JsonParseResult
-
-  def parse(text: String): JsonParseResult = {
-    val result = AstHelpers.parse(this, text)
+  def parseWithDsl(text: String): Either[String, (GenericTree, Ast.Value)] = {
+    val result = AstHelpers.parse(Json, text)
     if (result.success) {
       val navigator = Navigator(result)
       if (!navigator.hasNext) {
-        JPRError("No AST found")
+        Left("No AST found")
       } else {
         val ast = navigator.next()
         if (navigator.hasNext) {
-          JPRError("Too many ASTs")
+          Left("Too many ASTs")
         } else {
           ast.root.value match {
             case v: Ast.Value =>
-              JPRSuccess(ast, v)
+              Right((ast, v))
             case _            =>
-              JPRError("AST root is not a Value")
+              Left("AST root is not a Value")
           }
         }
       }
     } else {
-      JPRError("result error " + result.reportErrors().mkString(", "))
+      Left("result error " + result.reportErrors().mkString(", "))
     }
   }
 

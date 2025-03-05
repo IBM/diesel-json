@@ -53,7 +53,7 @@ class JsonSchemaValidationTest extends FunSuite {
   }
 
   private def assertErrors(schema: String)(json: String, expected: Any): Unit =
-    Util.assertErrors(parseSchema(schema))(json) { (_, e) => assert(e == expected) }
+    Util.assertErrors(parseSchema(schema))(json) { (_, e) => assertEquals(e, expected) }
 
   private def assertNoErrors(schema: String)(json: String): Unit =
     Util.assertErrors(parseSchema(schema))(json) { (_, e) => assert(e.isEmpty) }
@@ -490,8 +490,8 @@ class JsonSchemaValidationTest extends FunSuite {
   private val schemaPattern: String =
     """{
       |  "type": "string",
-      |  "pattern": "\d+"
-      |""".stripMargin
+      |  "pattern": "\\d+"
+      |}""".stripMargin
 
   test("pattern ok") {
     assertErrors(schemaPattern)(

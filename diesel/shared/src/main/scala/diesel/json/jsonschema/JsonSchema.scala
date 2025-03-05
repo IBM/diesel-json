@@ -20,12 +20,13 @@ import diesel.SimpleMarkerMessage
 import diesel.Errors.SemanticError
 import diesel.json.Ast.Constants.{astNull, astObject}
 import diesel.json.Ast.{Position, Value}
-import diesel.json.{Ast, Json}
-import diesel.{GenericTree, Marker}
+import diesel.json.Ast
+import diesel.Marker
 
 import java.time.{LocalDate, LocalTime, OffsetDateTime, OffsetTime}
 import scala.util.Try
 import scala.util.matching.Regex
+import diesel.json.JsonParser
 
 sealed trait JsonSchema extends JsonSchemaValidator
 
@@ -90,10 +91,10 @@ class JsonSchemaParserContext(
             case Some(externalRef) =>
               val externalResource = externalResourceResolver.flatMap(resolver => resolver.apply(externalRef))
               externalResource.flatMap { externalSchemaText =>
-                Json.parse(externalSchemaText) match {
-                  case Json.JPRError(_)          =>
+                JsonParser.parse(externalSchemaText) match {
+                  case JsonParser.JPRError(_)       =>
                     None
-                  case Json.JPRSuccess(_, value) =>
+                  case JsonParser.JPRSuccess(value) =>
                     Some(JsonSchema.parse(value, new JsonSchemaParserContext(value, externalResourceResolver)))
                 }
               }
@@ -116,10 +117,10 @@ object JsonSchema extends JsonSchemaParser {
     text: String,
     externalResourceResolver: Option[String => Option[String]] = None
   ): Either[String, (Ast.Value, JsonSchema)] = {
-    Json.parse(text) match {
-      case Json.JPRError(message)       =>
+    JsonParser.parse(text) match {
+      case JsonParser.JPRError(message) =>
         Left(message)
-      case Json.JPRSuccess(tree, value) =>
+      case JsonParser.JPRSuccess(value) =>
         val x = parse(value, new JsonSchemaParserContext(value, externalResourceResolver))
         Right((value, x))
     }
@@ -143,8 +144,7 @@ object JsonSchema extends JsonSchemaParser {
       Marker(SemanticError, pos.offset, pos.length, SimpleMarkerMessage(ve.message))
     }
 
-  def postProcessMarkers(schema: JsonSchema)(tree: GenericTree): Seq[Marker] = {
-    val value        = tree.root.value.asInstanceOf[Ast.Value]
+  def postProcessMarkers(schema: JsonSchema)(value: Ast.Value): Seq[Marker] = {
     val schemaErrors = schema.validate(value).getErrors
     JsonSchema.convertValidationErrorsToMarkers(value, schemaErrors)
   }

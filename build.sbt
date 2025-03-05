@@ -51,7 +51,8 @@ lazy val diesel = crossProject(JSPlatform, JVMPlatform)
     libraryDependencies ++= Seq(
       "com.ibm.cloud.diesel" %%% "diesel-i18n"     % Dependencies.dieselI18nVersion,
       "com.ibm.cloud.diesel" %%% "diesel-core"     % Dependencies.dieselVersion,
-      "io.github.cquiroz"    %%% "scala-java-time" % "2.6.0"
+      "io.github.cquiroz"    %%% "scala-java-time" % "2.6.0",
+      "org.typelevel"        %%% "jawn-parser"     % "1.3.2"
     )
   )
   .settings(
