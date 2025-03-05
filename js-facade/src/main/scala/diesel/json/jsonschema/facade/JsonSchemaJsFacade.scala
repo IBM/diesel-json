@@ -35,9 +35,7 @@ object JsonSchemaJsFacade {
   class JsonMarkerPostProcessor(private val schema: JsonSchema) extends MarkerPostProcessor {
     override def postProcessMarkers(tree: GenericTree): Seq[Marker] = {
       val existingMarkers = tree.markers
-      println("existing", existingMarkers)
       val schemaMarkers   = JsonSchema.postProcessMarkers(schema)(tree.value.asInstanceOf[Ast.Value])
-      println("schema", schemaMarkers)
       existingMarkers ++ schemaMarkers
     }
   }

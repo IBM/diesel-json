@@ -30,7 +30,6 @@ class JsonParserTest extends FunSuite {
       case JPRError(message) =>
         fail(message)
       case JPRSuccess(value) =>
-        println(value)
         assertEquals(value, expected)
         Json.parseWithDsl(text) match {
           case Left(message)   =>
