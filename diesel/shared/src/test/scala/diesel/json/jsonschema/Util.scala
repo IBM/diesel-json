@@ -16,16 +16,17 @@
 
 package diesel.json.jsonschema
 
-import diesel.json.{Ast, Json}
+import diesel.json.Ast
 import munit.Assertions.fail
+import diesel.json.JsonParser
 
 object Util {
 
   def parseSchema(text: String, externalResourceResolver: Option[String => Option[String]] = None): JsonSchema =
-    Json.parse(text) match {
-      case Json.JPRError(message)    =>
+    JsonParser.parse(text) match {
+      case JsonParser.JPRError(message) =>
         fail(s"Unable to parse schema : $message")
-      case Json.JPRSuccess(_, value) =>
+      case JsonParser.JPRSuccess(value) =>
         parseSchemaValue(value, externalResourceResolver)
     }
 
@@ -36,10 +37,10 @@ object Util {
     JsonSchema.parse(value, new JsonSchemaParserContext(value, externalResourceResolver))
 
   def parseJson(text: String): Ast.Value =
-    Json.parse(text) match {
-      case Json.JPRError(message)       =>
+    JsonParser.parse(text) match {
+      case JsonParser.JPRError(message) =>
         fail(message)
-      case Json.JPRSuccess(tree, value) =>
+      case JsonParser.JPRSuccess(value) =>
         value
     }
 

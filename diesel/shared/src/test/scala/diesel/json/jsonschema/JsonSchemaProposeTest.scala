@@ -16,12 +16,13 @@
 
 package diesel.json.jsonschema
 
-import diesel.json.{Ast, Json}
+import diesel.json.Ast
 import diesel.json.Ast.Constants._
 import diesel.json.Ast.Builder._
 import diesel.json.Ast.Builder.Implicits._
 import JPath.Implicits._
 import munit.FunSuite
+import diesel.json.Json
 
 class JsonSchemaProposeTest extends FunSuite {
 
@@ -43,11 +44,11 @@ class JsonSchemaProposeTest extends FunSuite {
     maxDepth: Int = -1
   ): Unit = {
     val s         = JsonSchema.parse(schema).toOption.get
-    val j         = Json.parse(json) match {
-      case Json.JPRError(message)    =>
+    val j         = Json.parseWithDsl(json) match {
+      case Left(message) =>
         fail(message)
-      case Json.JPRSuccess(_, value) =>
-        value
+      case Right(value)  =>
+        value._2
     }
     val vr        = s._2.validate(j)
     val proposals = JsonSchema.propose(vr, j, path, maxDepth)

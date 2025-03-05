@@ -28,14 +28,14 @@ class JsonValidatorTest extends FunSuite {
   implicit val en: Messages.KeyResolver = I18n.currentKeyResolver
 
   private def validate(schema: Option[JsonSchema], text: String): Seq[Marker] = {
-    Json.parse(text) match {
-      case Json.JPRError(message)   =>
+    Json.parseWithDsl(text) match {
+      case Left(message) =>
         fail(message)
-      case Json.JPRSuccess(tree, _) =>
+      case Right(value)  =>
         val schemaMarkers = schema
-          .map(s => JsonSchema.postProcessMarkers(s)(tree))
+          .map(s => JsonSchema.postProcessMarkers(s)(value._2))
           .getOrElse(Seq.empty)
-        tree.markers ++ schemaMarkers
+        value._1.markers ++ schemaMarkers
     }
   }
 
@@ -49,7 +49,7 @@ class JsonValidatorTest extends FunSuite {
       }
     }
     val actual = validate(s, text)
-    assert(actual == expectedMarkers)
+    assertEquals(actual, expectedMarkers)
   }
 
   private def parseSchema(text: String): JsonSchema =

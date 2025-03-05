@@ -309,7 +309,7 @@ object Examples {
       |            "radius": {
       |              "type": "number"
       |            }
-      |          }
+      |          },
       |          "required": [ "radius" ]
       |        }
       |      ]
