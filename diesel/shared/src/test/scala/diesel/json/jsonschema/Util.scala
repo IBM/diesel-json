@@ -24,7 +24,7 @@ object Util {
 
   def parseSchema(text: String, externalResourceResolver: Option[String => Option[String]] = None): JsonSchema =
     JsonParser.parse(text) match {
-      case JsonParser.JPRError(message)    =>
+      case JsonParser.JPRError(message) =>
         fail(s"Unable to parse schema : $message")
       case JsonParser.JPRSuccess(value) =>
         parseSchemaValue(value, externalResourceResolver)
@@ -38,7 +38,7 @@ object Util {
 
   def parseJson(text: String): Ast.Value =
     JsonParser.parse(text) match {
-      case JsonParser.JPRError(message)       =>
+      case JsonParser.JPRError(message) =>
         fail(message)
       case JsonParser.JPRSuccess(value) =>
         value
