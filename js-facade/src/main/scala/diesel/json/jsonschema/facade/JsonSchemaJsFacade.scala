@@ -26,6 +26,8 @@ import diesel.{CompletionConfiguration, GenericTree, Marker}
 import scala.scalajs.js
 import scala.scalajs.js.JSConverters._
 import scala.scalajs.js.annotation.{JSExport, JSExportAll, JSExportTopLevel}
+import diesel.json.Ast
+import diesel.json.JsonParser
 
 @JSExportTopLevel("JsonSchemaJsFacade")
 object JsonSchemaJsFacade {
@@ -34,7 +36,7 @@ object JsonSchemaJsFacade {
     override def postProcessMarkers(tree: GenericTree): Seq[Marker] = {
       val existingMarkers = tree.markers
       println("existing", existingMarkers)
-      val schemaMarkers   = JsonSchema.postProcessMarkers(schema)(tree)
+      val schemaMarkers   = JsonSchema.postProcessMarkers(schema)(tree.value.asInstanceOf[Ast.Value])
       println("schema", schemaMarkers)
       existingMarkers ++ schemaMarkers
     }
@@ -92,9 +94,9 @@ object JsonSchemaJsFacade {
 
   @JSExport
   def parseValue(value: String): JsonValue = {
-    Json.parse(value) match {
-      case Json.JPRError(err)    => throw new RuntimeException(err)
-      case Json.JPRSuccess(_, v) => JsonValue(v.clearPosition)
+    JsonParser.parse(value) match {
+      case JsonParser.JPRError(err) => throw new RuntimeException(err)
+      case JsonParser.JPRSuccess(v) => JsonValue(v.clearPosition)
     }
   }
 

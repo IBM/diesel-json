@@ -57,7 +57,12 @@ class JsonCustomPredictionTest extends FunSuite {
     expectedPredictions: Seq[String],
     expectedReplacements: Option[Seq[Option[(Int, Int)]]] = None
   ): Unit = {
-    val s         = JsonSchema.parse(schema).toOption.get._2
+    val s         = JsonSchema.parse(schema) match {
+      case Left(err)    =>
+        fail(err)
+      case Right(value) =>
+        value._2
+    }
     val config    = JsonCompletion.completionConfiguration(s)
     val proposals = predict(Json, text, offset, Some(config))
     assertEquals(proposals.map(_.text), expectedPredictions)
@@ -596,13 +601,13 @@ class JsonCustomPredictionTest extends FunSuite {
         |      "type": "object",
         |      "properties": {
         |        "foo": {
-        |          "type": "string",
-        |        },
-        |      },
+        |          "type": "string"
+        |        }
+        |      }
         |}""".stripMargin,
       "{}",
       offset = 1,
-      Seq("}", "\"\"", "\"foo\"", "\"\"")
+      Seq("}", "\"foo\"", "\"\"")
     )
   }
 }
