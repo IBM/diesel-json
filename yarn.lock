@@ -878,9 +878,9 @@ bluebird@^3.5.1, bluebird@^3.5.3, bluebird@^3.5.5:
   integrity sha512-XpNj6GDQzdfW+r2Wnn7xiSAd7TM3jzkxGXBGTtWKuSXv1xUV+azxAm8jdWZN06QTQk+2N2XB9jRDkvbmQmcRtg==
 
 bomlint@^1.2.3:
-  version "1.2.3"
-  resolved "https://registry.yarnpkg.com/bomlint/-/bomlint-1.2.3.tgz#f181ec55a2a5de6943b87af91ded237820d01ebd"
-  integrity sha512-RK+fDLoNKxH+TLjmCda7RwU8i7E5xTMAPqdzWVsNKqgg0siHgYSRBr0bnzppkTRGvXyUW/a2gbXzxSFWSbhVUg==
+  version "1.2.5"
+  resolved "https://registry.yarnpkg.com/bomlint/-/bomlint-1.2.5.tgz#f9f62d12f49b9866104501b62ff0ff09b2370761"
+  integrity sha512-CZ5AuzO/pSmKeW62fW6/pkocZsbmKgGA9PTEwjVgyHI0IBw5zhdEwkit5W5PFfYxofYOONdNgyB/P80JnnmQ/Q==
   dependencies:
     commander "^10.0.1"
 
