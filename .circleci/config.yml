@@ -32,7 +32,7 @@ jobs:
   deploy:
     <<: *defaults
     docker:
-    - image: circleci/node:erbium
+    - image: circleci/node:12.22.7
     steps:
       - attach_workspace:
           at: ~/repo
