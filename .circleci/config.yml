@@ -32,7 +32,7 @@ jobs:
   deploy:
     <<: *defaults
     docker:
-    - image: circleci/node:12.22.7
+    - image: circleci/node:16.13.1
     steps:
       - attach_workspace:
           at: ~/repo
