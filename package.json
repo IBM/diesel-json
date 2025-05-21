@@ -8,7 +8,7 @@
   ],
   "devDependencies": {
     "github-release-notes": "0.17.3",
-    "bomlint": "^1.2.3"
+    "bomlint": "^2.0.0"
   },
   "scripts": {
     "release:gh": "gren release",
