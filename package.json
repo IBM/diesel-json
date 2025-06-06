@@ -1,18 +1,18 @@
 {
-  "name": "@diesel-parser/json-schema-parent",
-  "version": "0.2.0",
-  "private": true,
-  "workspaces": [
-    "js-facade",
-    "ts-facade"
-  ],
-  "devDependencies": {
-    "github-release-notes": "0.17.3",
-    "bomlint": "^2.0.0"
-  },
-  "scripts": {
-    "release:gh": "gren release",
-    "release:changelog": "gren changelog --tags all --generate --override",
-    "bomlint": "bomlint package.json js-facade/package.json ts-facade/package.json"
-  }
+    "name": "@diesel-parser/json-schema-parent",
+    "version": "0.2.0",
+    "private": true,
+    "workspaces": [
+        "js-facade",
+        "ts-facade"
+    ],
+    "devDependencies": {
+        "github-release-notes": "0.17.3",
+        "bomlint": "^2.0.0"
+    },
+    "scripts": {
+        "release:gh": "gren release",
+        "release:changelog": "gren changelog --tags all --generate --override",
+        "bomlint": "bomlint check package.json js-facade/package.json ts-facade/package.json"
+    }
 }
