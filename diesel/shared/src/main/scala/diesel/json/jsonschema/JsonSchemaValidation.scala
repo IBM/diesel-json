@@ -348,10 +348,14 @@ case class SchemaObjectValidation(
   override def renderer: Option[Renderer] = schema.renderer
 
   override def getProposals(results: Set[JsonSchemaValidationResult]): Seq[Ast.Value] = {
+
     val newResults = results + this
 
     val enumValues    = enum1._1.map(_.clearPosition)
     val constValues   = const.map(_._1.clearPosition).map(Seq(_)).getOrElse(Seq.empty)
+
+        println("RVKB /" + path.format + ":" + constValues )
+
     val defaultValue  = schema.default.toSeq.map(_.clearPosition)
     val exampleValues = schema.examples.map(_.elems).getOrElse(Seq.empty).map(_.clearPosition)
 

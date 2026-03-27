@@ -612,4 +612,33 @@ class JsonSchemaProposeTest extends FunSuite {
     )
   }
 
+  test("propose oneOf with const") {
+    assertValidationProposals("""{
+    "oneOf": [
+        {
+            "properties": {
+                "kind": {
+                    "type": "string",
+                    "const": "cat"
+                },
+                "purr": {
+                    "type": "boolean"
+                }
+            }
+        },
+        {
+            "properties": {
+                "kind": {
+                    "type": "string",
+                    "const": "dog"
+                },
+                "bark": {
+                    "type": "boolean"
+                }
+            }
+        }
+    ]
+}""", """{"kind": "cat"}""", "/", Seq(astNull), 1)
+  }
+
 }

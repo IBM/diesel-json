@@ -190,6 +190,9 @@ object JsonSchema extends JsonSchemaParser {
                   maxDepth - 1,
                   newProposed
                 )
+
+                println("RVKB attrProposals /" + path.format + ":" + attrProposals)
+
                 // replace initially proposed value
                 attrProposals.headOption
                   .map { attrProposal =>
