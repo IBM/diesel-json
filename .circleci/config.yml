@@ -7,7 +7,7 @@ jobs:
   build:
     <<: *defaults
     docker:
-      - image: cimg/openjdk:11.0.12
+      - image: cimg/openjdk:21.0.6
 
     steps:
       - checkout
@@ -32,7 +32,7 @@ jobs:
   deploy:
     <<: *defaults
     docker:
-    - image: circleci/node:erbium
+    - image: circleci/node:16.13.1
     steps:
       - attach_workspace:
           at: ~/repo
