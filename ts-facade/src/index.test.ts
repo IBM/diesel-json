@@ -25,6 +25,7 @@ import {
   getRenderers,
   toJsonValue,
   JsonValue,
+  getDiscriminator,
 } from './index';
 
 function parseFromNative(value: any): JsonValue {
@@ -123,6 +124,15 @@ describe('renderers', function () {
     expect(r?.schemaValue).toEqual(schema);
     expect(renderers.get('yolo')).toBeUndefined();
   });
+
+  test('get discriminator', () => {
+    const schema = parseFromNative({
+      "discriminator": "gni"
+    });
+    const res = validate(schema, parseFromNative({}));
+    const d = getDiscriminator(res, "")
+    expect(d).toBe("gni");
+  })
 });
 
 function withProposals(
