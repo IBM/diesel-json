@@ -28,6 +28,7 @@ import scala.scalajs.js.JSConverters._
 import scala.scalajs.js.annotation.{JSExport, JSExportAll, JSExportTopLevel}
 import diesel.json.Ast
 import diesel.json.JsonParser
+import diesel.json.jsonschema.Schema2020_12.SchemaObject
 
 @JSExportTopLevel("JsonSchemaJsFacade")
 object JsonSchemaJsFacade {
@@ -134,6 +135,25 @@ object JsonSchemaJsFacade {
       }
     val names                                     = filtered.map(_.name)
     js.Array(names: _*)
+  }
+
+  @JSExport
+  def getDiscriminator(validationResult: JsValidationResult, path: String): js.UndefOr[String] = {
+    val parsedPath = JPath.parsePath(path)
+    validationResult.res.flatten
+      .find(_.path == parsedPath)
+      .map(_.schema)
+      .flatMap {
+        case so: SchemaObject => {
+          so.node
+            .attr("discriminator")
+            .flatMap(_.asAstStr)
+            .map(_.v)
+        }
+        case _                =>
+          None
+      }
+      .orUndefined
   }
 
   @JSExportAll

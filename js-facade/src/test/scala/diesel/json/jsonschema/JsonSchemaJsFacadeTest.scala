@@ -286,6 +286,16 @@ class JsonSchemaJsFacadeTest extends FunSuite {
     )
   }
 
+  test("discriminator") {
+    val schema = parse("""{
+                         |  "discriminator": "gni"
+                         |}""".stripMargin)
+    val value  = parse("""{}""")
+    val res    = JsonSchemaJsFacade.validate(schema, value)
+    val d      = JsonSchemaJsFacade.getDiscriminator(res, "")
+    assertEquals(d.get, "gni")
+  }
+
 }
 
 @js.native
