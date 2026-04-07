@@ -614,31 +614,101 @@ class JsonSchemaProposeTest extends FunSuite {
 
   test("propose oneOf with const") {
     assertValidationProposals("""{
-    "oneOf": [
-        {
-            "properties": {
-                "kind": {
-                    "type": "string",
-                    "const": "cat"
-                },
-                "purr": {
-                    "type": "boolean"
-                }
-            }
-        },
-        {
-            "properties": {
-                "kind": {
-                    "type": "string",
-                    "const": "dog"
-                },
-                "bark": {
-                    "type": "boolean"
-                }
-            }
-        }
-    ]
-}""", """{"kind": "cat"}""", "/", Seq(astNull), 1)
+                                |    "$schema": "https://json-schema.org/draft/2019-09/schema",
+                                |    "$id": "http://schema/animal/AnimalExtAn.json",
+                                |    "oneOf": [
+                                |        {
+                                |            "$ref": "#/$defs/schema.animal.LionExtAn"
+                                |        },
+                                |        {
+                                |            "$ref": "#/$defs/schema.animal.ElephantExtAn"
+                                |        }
+                                |    ],
+                                |    "$defs": {
+                                |        "schema.animal.LionExtAn": {
+                                |            "type": "object",
+                                |            "properties": {
+                                |                "what": {
+                                |                    "type": "string",
+                                |                    "const": "schema.animal.LionExtAn"
+                                |                },
+                                |                "lion": {
+                                |                    "type": "string"
+                                |                }
+                                |            }
+                                |        },
+                                |        "schema.animal.ElephantExtAn": {
+                                |            "type": "object",
+                                |            "properties": {
+                                |                "what": {
+                                |                    "type": "string",
+                                |                    "const": "schema.animal.ElephantExtAn"
+                                |                },
+                                |                "elephant": {
+                                |                    "type": "boolean"
+                                |                }
+                                |            }
+                                |        }
+                                |    }
+                                |}""".stripMargin,
+      """{"what": "schema.animal.LionExtAn"}""",
+      "/", Seq(obj(
+        "what" -> str("schema.animal.LionExtAn"),
+        "lion" -> astNull
+      )))
+  }
+
+  test("propose oneOf with const 2") {
+    assertValidationProposals("""{
+                                |    "$schema": "https://json-schema.org/draft/2019-09/schema",
+                                |    "$id": "http://schema/animal/AnimalExtAn.json",
+                                |    "oneOf": [
+                                |        {
+                                |            "$ref": "#/$defs/schema.animal.LionExtAn"
+                                |        },
+                                |        {
+                                |            "$ref": "#/$defs/schema.animal.ElephantExtAn"
+                                |        }
+                                |    ],
+                                |    "$defs": {
+                                |        "schema.animal.LionExtAn": {
+                                |            "type": "object",
+                                |            "properties": {
+                                |                "what": {
+                                |                    "type": "string",
+                                |                    "const": "schema.animal.LionExtAn"
+                                |                },
+                                |                "lion": {
+                                |                    "type": "string"
+                                |                }
+                                |            }
+                                |        },
+                                |        "schema.animal.ElephantExtAn": {
+                                |            "type": "object",
+                                |            "properties": {
+                                |                "what": {
+                                |                    "type": "string",
+                                |                    "const": "schema.animal.ElephantExtAn"
+                                |                },
+                                |                "elephant": {
+                                |                    "type": "boolean"
+                                |                }
+                                |            }
+                                |        }
+                                |    }
+                                |}""".stripMargin,
+      """{}""",
+      "/", Seq(
+        obj(
+          "what" -> str("schema.animal.LionExtAn"),
+          "lion" -> astNull
+        ),
+        obj(
+          "what" -> str("schema.animal.ElephantExtAn"),
+          "elephant" -> astNull
+        ),
+      )
+    )
   }
 
 }
