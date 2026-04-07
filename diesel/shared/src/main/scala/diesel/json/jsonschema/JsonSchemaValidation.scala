@@ -199,34 +199,66 @@ case class TObjectValidation(
 ) extends TypeValidation {
 
   override def getProposals(results: Set[JsonSchemaValidationResult]): Seq[Ast.Value] = {
-    val attrs: Seq[Ast.Attribute] = properties
-      .toSeq
-      .map { prop =>
-        prop._2.map {
-          case SchemaObjectValidation(schema, path, types, enum1, const, allOf, anyOf, oneOf, not, ifThenElse) =>
-            const match {
-              case Some((value,validated)) => {
-                if (validated) {
-                  attr(prop._1, value)
-                } else {
-                  attr(prop._1, astNull)
-                }
-              }
-              case None => {
-                attr(prop._1, astNull)
-              }
-            }
-          case _ =>
-            attr(prop._1, astNull)
-        }.getOrElse(attr(prop._1, astNull))
-      }
+//    val attrs: Seq[Ast.Attribute] = properties
+//      .toSeq
+//      .map { prop =>
+//        prop._2.map {
+//          case SchemaObjectValidation(schema, path, types, enum1, const, allOf, anyOf, oneOf, not, ifThenElse) =>
+//            const match {
+//              case Some((value,validated)) => {
+//                if (validated) {
+//                  attr(prop._1, value)
+//                } else {
+//                  attr(prop._1, astNull)
+//                }
+//              }
+//              case None => {
+//                attr(prop._1, astNull)
+//              }
+//            }
+//          case _ =>
+//            attr(prop._1, astNull)
+//        }.getOrElse(attr(prop._1, astNull))
+//      }
 
 //    val attrs: Seq[Ast.Attribute] = tObject.properties
 //      .keys
 //      .map { name => attr(name, astNull) }
 //      .toSeq
 //      .sortBy(_.name.s)
-    Seq(obj(attrs))
+
+    val attrs = tObject.properties
+      .map { case (name, schema) =>
+        val constValue = schema match {
+          case s: SchemaObject =>
+            s.const.map(_.clearPosition)
+          case _               =>
+            None
+        }
+        attr(name, constValue.getOrElse(astNull))
+      }
+      .toSeq
+
+    val hasInvalidConst = attrs.exists(attrHasInvalidConst)
+
+    if (hasInvalidConst) {
+      Seq()
+    } else {
+      Seq(obj(attrs))
+    }
+  }
+
+  def attrHasInvalidConst(attr: Ast.Attribute): Boolean = {
+    val prop = properties
+      .find { case (name, _) =>
+        name == attr.name.s
+      }
+      .flatMap { case (_, vr) => vr }
+      .flatMap {
+        case sov: SchemaObjectValidation => sov.const.map(_._2)
+        case _                           => None
+      }
+    prop.contains(false)
   }
 
   override def getChildren: Seq[JsonSchemaValidationResult] =
@@ -375,9 +407,6 @@ case class SchemaObjectValidation(
 
     val enumValues    = enum1._1.map(_.clearPosition)
     val constValues   = const.map(_._1.clearPosition).map(Seq(_)).getOrElse(Seq.empty)
-
-        println("RVKB /" + path.format + ":" + constValues )
-
     val defaultValue  = schema.default.toSeq.map(_.clearPosition)
     val exampleValues = schema.examples.map(_.elems).getOrElse(Seq.empty).map(_.clearPosition)
 

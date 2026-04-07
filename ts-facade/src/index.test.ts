@@ -192,7 +192,7 @@ describe('propose', () => {
     withProposals(objectSchemaFooBar, {}, '', -1, (proposals) => {
       expect(proposals.length).toBe(1);
       expect(stringifyValue(proposals[0])).toEqual(
-        JSON.stringify({ bar: null, foo: null }),
+        JSON.stringify({ foo: null, bar: null }),
       );
     });
   });
@@ -200,7 +200,7 @@ describe('propose', () => {
     withProposals(objectSchemaFooBar, {}, '', 2, (proposals) => {
       expect(proposals.length).toBe(1);
       expect(stringifyValue(proposals[0])).toEqual(
-        JSON.stringify({ bar: 0, foo: '' }),
+        JSON.stringify({ foo: '', bar: 0 }),
       );
     });
   });
