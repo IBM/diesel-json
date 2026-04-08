@@ -221,24 +221,14 @@ case class TObjectValidation(
   }
 
   def attrHasInvalidConst(attr: Ast.Attribute): Boolean = {
-    val prop = properties
+    properties
       .get(attr.name.s)
       .flatten
       .flatMap {
         case sov: SchemaObjectValidation => sov.const.map(_._2)
         case _                           => None
       }
-
-//    val prop = properties
-//      .find { case (name, _) =>
-//        name == attr.name.s
-//      }
-//      .flatMap { case (_, vr) => vr }
-//      .flatMap {
-//        case sov: SchemaObjectValidation => sov.const.map(_._2)
-//        case _                           => None
-//      }
-    prop.contains(false)
+      .contains(false)
   }
 
   override def getChildren: Seq[JsonSchemaValidationResult] =
