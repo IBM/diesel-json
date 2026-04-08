@@ -199,12 +199,36 @@ case class TObjectValidation(
 ) extends TypeValidation {
 
   override def getProposals(results: Set[JsonSchemaValidationResult]): Seq[Ast.Value] = {
-    val attrs: Seq[Ast.Attribute] = tObject.properties
-      .keys
-      .map { name => attr(name, astNull) }
+    val attrs = tObject.properties
+      .map { case (name, schema) =>
+        val constValue = schema match {
+          case s: SchemaObject =>
+            s.const.map(_.clearPosition)
+          case _               =>
+            None
+        }
+        attr(name, constValue.getOrElse(astNull))
+      }
       .toSeq
-      .sortBy(_.name.s)
-    Seq(obj(attrs))
+
+    val hasInvalidConst = attrs.exists(attrHasInvalidConst)
+
+    if (hasInvalidConst) {
+      Seq()
+    } else {
+      Seq(obj(attrs))
+    }
+  }
+
+  def attrHasInvalidConst(attr: Ast.Attribute): Boolean = {
+    properties
+      .get(attr.name.s)
+      .flatten
+      .flatMap {
+        case sov: SchemaObjectValidation => sov.const.map(_._2)
+        case _                           => None
+      }
+      .contains(false)
   }
 
   override def getChildren: Seq[JsonSchemaValidationResult] =
@@ -348,6 +372,7 @@ case class SchemaObjectValidation(
   override def renderer: Option[Renderer] = schema.renderer
 
   override def getProposals(results: Set[JsonSchemaValidationResult]): Seq[Ast.Value] = {
+
     val newResults = results + this
 
     val enumValues    = enum1._1.map(_.clearPosition)

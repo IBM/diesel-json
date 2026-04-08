@@ -156,7 +156,6 @@ object JsonSchema extends JsonSchemaParser {
     maxDepth: Int,
     proposed: Map[Ast.Value, JPath] = Map.empty
   ): Seq[Ast.Value] = {
-
     val resultsAtPath = validationResult.flatten.filter(_.path == path)
     val proposals     = resultsAtPath.flatMap(_.getProposals()).distinct
     if (maxDepth < 0) {
