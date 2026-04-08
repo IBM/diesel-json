@@ -199,34 +199,6 @@ case class TObjectValidation(
 ) extends TypeValidation {
 
   override def getProposals(results: Set[JsonSchemaValidationResult]): Seq[Ast.Value] = {
-//    val attrs: Seq[Ast.Attribute] = properties
-//      .toSeq
-//      .map { prop =>
-//        prop._2.map {
-//          case SchemaObjectValidation(schema, path, types, enum1, const, allOf, anyOf, oneOf, not, ifThenElse) =>
-//            const match {
-//              case Some((value,validated)) => {
-//                if (validated) {
-//                  attr(prop._1, value)
-//                } else {
-//                  attr(prop._1, astNull)
-//                }
-//              }
-//              case None => {
-//                attr(prop._1, astNull)
-//              }
-//            }
-//          case _ =>
-//            attr(prop._1, astNull)
-//        }.getOrElse(attr(prop._1, astNull))
-//      }
-
-//    val attrs: Seq[Ast.Attribute] = tObject.properties
-//      .keys
-//      .map { name => attr(name, astNull) }
-//      .toSeq
-//      .sortBy(_.name.s)
-
     val attrs = tObject.properties
       .map { case (name, schema) =>
         val constValue = schema match {
