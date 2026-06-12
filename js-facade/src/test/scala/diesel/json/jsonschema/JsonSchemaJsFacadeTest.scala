@@ -307,6 +307,40 @@ class JsonSchemaJsFacadeTest extends FunSuite {
     assertEquals(d.contains("bar"), false);
   }
 
+  test("required props nested") {
+    val schema = parse("""{
+                         |    "type": "object",
+                         |    "properties": {
+                         |        "input": {
+                         |            "type": "object",
+                         |            "properties": {
+                         |                "foo": {
+                         |                    "type": "string"
+                         |                },
+                         |                "bar": {
+                         |                    "type": "number"
+                         |                }
+                         |            },
+                         |            "required": ["foo"]
+                         |        }
+                         |
+                         |    }
+                         |}""".stripMargin)
+    val value  = parse(
+      """{
+        | "input": {
+        |   "foo": "hello",
+        |   "bar": 456
+        | }
+        |}""".stripMargin
+    )
+    val res    = JsonSchemaJsFacade.validate(schema, value)
+    val d      = JsonSchemaJsFacade.getRequiredProperties(res)
+    assertEquals(d.contains("input/foo"), true);
+    assertEquals(d.contains("input"), false);
+    assertEquals(d.contains("input/bar"), false);
+  }
+
 }
 
 @js.native
