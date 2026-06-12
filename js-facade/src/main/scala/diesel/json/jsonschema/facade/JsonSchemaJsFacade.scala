@@ -175,6 +175,29 @@ object JsonSchemaJsFacade {
       .toJSMap
   }
 
+  @JSExport
+  def getRequiredProperties(validationResult: JsValidationResult): js.Set[String] = {
+    validationResult.res
+      .flatten
+      .map(_.schema)
+      .flatMap {
+        case so: SchemaObject => {
+          so.node
+            .attr("required")
+            .flatMap(_.asAstArray)
+            .map(_.elems)
+            .getOrElse(Seq())
+            .flatMap(_.asAstStr)
+            .map(_.v)
+        }
+        case _                => {
+          Seq.empty
+        }
+      }
+      .toSet
+      .toJSSet
+  }
+
   private def toJsError(e: JsonValidationError): JsValidationError =
     JsValidationError(e.path.format, e.message)
 

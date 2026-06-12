@@ -296,6 +296,17 @@ class JsonSchemaJsFacadeTest extends FunSuite {
     assertEquals(d.get, "gni")
   }
 
+  test("required props") {
+    val schema = parse("""{
+                         |  "required": ["foo"]
+                         |}""".stripMargin)
+    val value  = parse("""{"foo": 123, "bar": 456}""")
+    val res    = JsonSchemaJsFacade.validate(schema, value)
+    val d      = JsonSchemaJsFacade.getRequiredProperties(res)
+    assertEquals(d.contains("foo"), true);
+    assertEquals(d.contains("bar"), false);
+  }
+
 }
 
 @js.native

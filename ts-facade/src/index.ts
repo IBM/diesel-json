@@ -103,6 +103,11 @@ export function getDiscriminator(
     return JsonSchemaJsFacade.getDiscriminator(res, path);
 }
 
+export function getRequiredProperties(res: JsValidationResult): Set<string> {
+    // @ts-ignore
+    return JsonSchemaJsFacade.getRequiredProperties(res);
+}
+
 export function getJsonParser(schema: JsonValue): DieselParserFacade {
   return JsonSchemaJsFacade.getJsonParser(schema) as DieselParserFacade;
 }
