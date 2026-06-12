@@ -26,6 +26,7 @@ import {
   toJsonValue,
   JsonValue,
   getDiscriminator,
+  getRequiredProperties,
 } from './index';
 
 function parseFromNative(value: any): JsonValue {
@@ -134,6 +135,17 @@ describe('renderers', function () {
     expect(d).toBe("gni");
   })
 });
+
+test('required', () => {
+    const schema = parseFromNative({
+      type: 'object',
+      required: ['foo'],
+    });
+    const res = validate(schema, parseFromNative('{foo: 123, bar: true}'));
+    const required = getRequiredProperties(res);
+    expect(required.has("foo")).toBe(true);
+    expect(required.has("bar")).toBe(false);
+})
 
 function withProposals(
   s: any,
