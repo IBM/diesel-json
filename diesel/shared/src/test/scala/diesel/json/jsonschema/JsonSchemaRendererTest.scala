@@ -81,4 +81,36 @@ class JsonSchemaRendererTest extends FunSuite {
     )
   }
 
+  test("required props nested") {
+    val schemaValue = Util.parseJson("""{
+                                       |    "type": "object",
+                                       |    "properties": {
+                                       |        "input": {
+                                       |            "type": "object",
+                                       |            "properties": {
+                                       |                "foo": {
+                                       |                    "type": "string"
+                                       |                },
+                                       |                "bar": {
+                                       |                    "type": "number"
+                                       |                }
+                                       |            },
+                                       |            "required": ["foo"]
+                                       |        }
+                                       |
+                                       |    }
+                                       |}""".stripMargin)
+    val s           = Util.parseSchemaValue(schemaValue)
+    val value       = Util.parseJson(
+      """{
+        | "input": {
+        |   "foo": "hello",
+        |   "bar": 456
+        | }
+        |}""".stripMargin
+    )
+    val res         = s.validate(value)
+    assertEquals(res.requiredProperties, Set("input/foo"));
+  }
+
 }

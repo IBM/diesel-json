@@ -45,6 +45,28 @@ sealed trait JsonSchemaValidationResult extends HasErrors with HasChildResults w
 
   def renderer: Option[Renderer]
 
+  def requiredProperties: Set[String] = {
+    this.flatten
+      .flatMap { res =>
+        res.schema match {
+          case so: SchemaObject => {
+            so.node
+              .attr("required")
+              .flatMap(_.asAstArray)
+              .map(_.elems)
+              .getOrElse(Seq())
+              .flatMap(_.asAstStr)
+              .map(_.v)
+              .map(propName => res.path.append(propName).format)
+          }
+          case _                => {
+            Seq.empty
+          }
+        }
+      }
+      .toSet
+  }
+
 }
 
 sealed trait JsonValidationError                                                          extends HasPath             {
