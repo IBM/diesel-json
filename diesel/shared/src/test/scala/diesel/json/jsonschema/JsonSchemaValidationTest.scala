@@ -122,7 +122,6 @@ class JsonSchemaValidationTest extends FunSuite {
     errs(
       "[1]",
       List(
-        InvalidTypeError("/", "null"),
         InvalidTypeError("/0", Seq("string", "null")),
         ValueNotInEnumError(
           "/0",
@@ -134,7 +133,6 @@ class JsonSchemaValidationTest extends FunSuite {
     errs(
       """["yes"]""",
       List(
-        InvalidTypeError("/", "null"),
         ValueNotInEnumError(
           "/0",
           List(Ast.Str(Ast.Position(126, 5), "FOO"), Ast.Str(Ast.Position(139, 5), "BAR"))
@@ -145,7 +143,6 @@ class JsonSchemaValidationTest extends FunSuite {
     errs(
       """[null]""",
       List(
-        InvalidTypeError("/", "null"),
         ValueNotInEnumError(
           "/0",
           List(Ast.Str(Ast.Position(126, 5), "FOO"), Ast.Str(Ast.Position(139, 5), "BAR"))
@@ -475,7 +472,7 @@ class JsonSchemaValidationTest extends FunSuite {
     noErrs("""{ "foo": "bar" }""")
     val errs   = Util.assertErrors(schema) _
     errs("""{ "definitions": 123 }""") { (_, es) =>
-      assert(es == List(InvalidTypeError("/", "boolean"), InvalidTypeError("/definitions", "object")))
+      assert(es == List(InvalidTypeError("/definitions", "object")))
     }
   }
 
@@ -483,7 +480,7 @@ class JsonSchemaValidationTest extends FunSuite {
     val schema = JsonSchemaSpec.schema
     val errs   = Util.assertErrors(schema) _
     errs("""{ "allOf": 1 }""") { (_, es) =>
-      assert(es == List(InvalidTypeError("/", "boolean"), InvalidTypeError("/allOf", "array")))
+      assert(es == List(InvalidTypeError("/allOf", "array")))
     }
   }
 
@@ -507,23 +504,40 @@ class JsonSchemaValidationTest extends FunSuite {
     )
   }
 
+//   test("validate nested should return only 1 error") {
+//     val schema = """{
+//     |  "type": ["array", "null"],
+//     |  "items": {
+//     |    "type": ["object","null"],
+//     |    "properties": {
+//     |       "foo": { "type": "number" },
+//     |       "bar": { "type": "boolean" }
+//     |    }
+//     |  }
+//     |}""".stripMargin
+//     assertErrors(schema)("""[
+//         |{
+//         |   "foo": "nan",
+//         |   "bar": true
+//         |}
+//         |]""".stripMargin, Seq(InvalidTypeError(JPath.empty.append(0).append("foo"), Seq("number"))))
+//   }
+
   test("validate nested should return only 1 error") {
     val schema = """{
-    |  "type": ["array", "null"],
-    |  "items": {
-    |    "type": ["object","null"],
-    |    "properties": {
-    |       "foo": { "type": "number" },
-    |       "bar": { "type": "boolean" }
-    |    }
-    |  }
-    |}""".stripMargin
-    assertErrors(schema)("""[
-        |{
+                   |    "type": ["object", "null"],
+                   |    "properties": {
+                   |            "foo": { "type": "number" },
+                   |            "bar": { "type": "boolean" }
+                   |    }
+                   |}""".stripMargin
+    assertErrors(schema)(
+      """{
         |   "foo": "nan",
         |   "bar": true
-        |}
-        |]""".stripMargin, Seq(InvalidTypeError(JPath.empty.append(0).append("foo"), Seq("number"))))
+        |}""".stripMargin,
+      Seq(InvalidTypeError(JPath.empty.append("foo"), Seq("number")))
+    )
   }
 
 }

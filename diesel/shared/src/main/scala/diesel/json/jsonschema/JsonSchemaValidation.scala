@@ -452,7 +452,14 @@ case class SchemaObjectValidation(
   }
 
   override def getErrors: Seq[JsonValidationError] = {
-    val typesErrors      = errorsAnyOf(types)
+
+    val validTypes       = types.filter(!_.invalidType)
+    val typesErrors      =
+      if (validTypes.nonEmpty && validTypes.size != types.size) {
+        errorsAnyOf(validTypes)
+      } else {
+        errorsAnyOf(types)
+      }
     val enumErrors       =
       if (!enum1._2) {
         Seq(ValueNotInEnumError(path, enum1._1))
