@@ -507,4 +507,23 @@ class JsonSchemaValidationTest extends FunSuite {
     )
   }
 
+  test("validate nested should return only 1 error") {
+    val schema = """{
+    |  "type": ["array", "null"],
+    |  "items": {
+    |    "type": ["object","null"],
+    |    "properties": {
+    |       "foo": { "type": "number" },
+    |       "bar": { "type": "boolean" }
+    |    }
+    |  }
+    |}""".stripMargin
+    assertErrors(schema)("""[
+        |{
+        |   "foo": "nan",
+        |   "bar": true
+        |}
+        |]""".stripMargin, Seq(InvalidTypeError(JPath.empty.append(0).append("foo"), Seq("number"))))
+  }
+
 }
