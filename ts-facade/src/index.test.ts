@@ -29,6 +29,8 @@ import {
   getRequiredProperties,
 } from './index';
 
+import { describe, expect, test } from 'vitest';
+
 function parseFromNative(value: any): JsonValue {
   const s = JSON.stringify(value);
   return parseValue(s);
