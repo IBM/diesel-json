@@ -14,26 +14,23 @@
     "access": "public"
   },
   "dependencies": {
-    "@diesel-parser/json-schema-facade-js": "^0.17.1"
+    "@diesel-parser/json-schema-facade-js": "^0.17.1",
+    "rimraf": "^6.1.3"
   },
   "devDependencies": {
     "@diesel-parser/ts-facade": "~0.32.0",
-    "@types/jest": "^29.0.0",
     "eslint-config-prettier": "^10.0.0",
     "eslint-plugin-prettier": "^5.0.0",
-    "jest": "30.0.0",
-    "npm-scripts-watcher": "^1.0.2",
-    "prettier": "3.5.3",
-    "ts-jest": "29.3.4",
-    "typescript": "~5.8.0"
+    "prettier": "3.9.6",
+    "typescript": "~5.8.0",
+    "vite": "^8.3.0",
+    "vitest": "^5.0.0"
   },
   "scripts": {
     "build": "yarn clean && yarn build:ts && yarn test",
     "build:ts": "tsc",
     "clean": "rimraf dist",
-    "test": "jest",
-    "test:watch": "jest --watch",
-    "watch": "npm-scripts-watcher",
+    "test": "vitest run",
     "prettify": "prettier --write .",
     "lint": "eslint '**/*.{js,ts,tsx}'",
     "lint:fix": "eslint '**/*.{js,ts,tsx}' --fix"
