@@ -15,7 +15,7 @@ scalacOptions ++= Seq(
   "-Wunused:imports"
 )
 
-Compile / fastOptJS := {
+Compile / fastOptJS := Def.uncached {
   val file = (Compile / fastOptJS).value
   IO.copyFile(file.data, baseDirectory.value / "dist" / "json-schema-facade.js")
   file
