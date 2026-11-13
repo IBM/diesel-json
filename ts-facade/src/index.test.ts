@@ -25,7 +25,11 @@ import {
   getRenderers,
   toJsonValue,
   JsonValue,
+  getDiscriminator,
+  getRequiredProperties,
 } from './index';
+
+import { describe, expect, test } from 'vitest';
 
 function parseFromNative(value: any): JsonValue {
   const s = JSON.stringify(value);
@@ -123,7 +127,27 @@ describe('renderers', function () {
     expect(r?.schemaValue).toEqual(schema);
     expect(renderers.get('yolo')).toBeUndefined();
   });
+
+  test('get discriminator', () => {
+    const schema = parseFromNative({
+      "discriminator": "gni"
+    });
+    const res = validate(schema, parseFromNative({}));
+    const d = getDiscriminator(res, "")
+    expect(d).toBe("gni");
+  })
 });
+
+test('required', () => {
+    const schema = parseFromNative({
+      type: 'object',
+      required: ['foo'],
+    });
+    const res = validate(schema, parseFromNative('{foo: 123, bar: true}'));
+    const required = getRequiredProperties(res);
+    expect(required.has("foo")).toBe(true);
+    expect(required.has("bar")).toBe(false);
+})
 
 function withProposals(
   s: any,
@@ -182,7 +206,7 @@ describe('propose', () => {
     withProposals(objectSchemaFooBar, {}, '', -1, (proposals) => {
       expect(proposals.length).toBe(1);
       expect(stringifyValue(proposals[0])).toEqual(
-        JSON.stringify({ bar: null, foo: null }),
+        JSON.stringify({ foo: null, bar: null }),
       );
     });
   });
@@ -190,7 +214,7 @@ describe('propose', () => {
     withProposals(objectSchemaFooBar, {}, '', 2, (proposals) => {
       expect(proposals.length).toBe(1);
       expect(stringifyValue(proposals[0])).toEqual(
-        JSON.stringify({ bar: 0, foo: '' }),
+        JSON.stringify({ foo: '', bar: 0 }),
       );
     });
   });

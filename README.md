@@ -4,7 +4,6 @@
 
 [![npm version](https://badge.fury.io/js/@diesel-parser%2Fjson-schema-facade-ts.svg)](https://badge.fury.io/js/@diesel-parser%2Fjson-schema-facade-ts)
 
-
 # diesel-json
 
 This repo contains :

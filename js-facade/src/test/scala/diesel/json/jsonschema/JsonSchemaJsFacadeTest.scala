@@ -286,6 +286,61 @@ class JsonSchemaJsFacadeTest extends FunSuite {
     )
   }
 
+  test("discriminator") {
+    val schema = parse("""{
+                         |  "discriminator": "gni"
+                         |}""".stripMargin)
+    val value  = parse("""{}""")
+    val res    = JsonSchemaJsFacade.validate(schema, value)
+    val d      = JsonSchemaJsFacade.getDiscriminator(res, "")
+    assertEquals(d.get, "gni")
+  }
+
+  test("required props") {
+    val schema = parse("""{
+                         |  "required": ["foo"]
+                         |}""".stripMargin)
+    val value  = parse("""{"foo": 123, "bar": 456}""")
+    val res    = JsonSchemaJsFacade.validate(schema, value)
+    val d      = JsonSchemaJsFacade.getRequiredProperties(res)
+    assertEquals(d.contains("foo"), true);
+    assertEquals(d.contains("bar"), false);
+  }
+
+  test("required props nested") {
+    val schema = parse("""{
+                         |    "type": "object",
+                         |    "properties": {
+                         |        "input": {
+                         |            "type": "object",
+                         |            "properties": {
+                         |                "foo": {
+                         |                    "type": "string"
+                         |                },
+                         |                "bar": {
+                         |                    "type": "number"
+                         |                }
+                         |            },
+                         |            "required": ["foo"]
+                         |        }
+                         |
+                         |    }
+                         |}""".stripMargin)
+    val value  = parse(
+      """{
+        | "input": {
+        |   "foo": "hello",
+        |   "bar": 456
+        | }
+        |}""".stripMargin
+    )
+    val res    = JsonSchemaJsFacade.validate(schema, value)
+    val d      = JsonSchemaJsFacade.getRequiredProperties(res)
+    assertEquals(d.contains("input/foo"), true);
+    assertEquals(d.contains("input"), false);
+    assertEquals(d.contains("input/bar"), false);
+  }
+
 }
 
 @js.native
