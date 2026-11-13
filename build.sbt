@@ -8,7 +8,7 @@ val scalaVersion_ = "2.13.18"
 lazy val copyrightSettings = Seq(
   startYear        := Some(2018),
   organizationName := "The Diesel Authors",
-  licenses += ("Apache-2.0", new URL("https://www.apache.org/licenses/LICENSE-2.0.txt"))
+  licenses += ("Apache-2.0", url("https://www.apache.org/licenses/LICENSE-2.0.txt"))
 )
 
 addCommandAlias("lint", "fmtCheck;fixCheck;headerCheckAll")
@@ -49,10 +49,10 @@ lazy val diesel = crossProject(JSPlatform, JVMPlatform)
   )
   .settings(
     libraryDependencies ++= Seq(
-      "com.ibm.cloud.diesel" %%% "diesel-i18n"     % Dependencies.dieselI18nVersion,
-      "com.ibm.cloud.diesel" %%% "diesel-core"     % Dependencies.dieselVersion,
-      "io.github.cquiroz"    %%% "scala-java-time" % "2.10.0",
-      "org.typelevel"        %%% "jawn-parser"     % "1.8.0"
+      "com.ibm.cloud.diesel" %% "diesel-i18n"     % Dependencies.dieselI18nVersion,
+      "com.ibm.cloud.diesel" %% "diesel-core"     % Dependencies.dieselVersion,
+      "io.github.cquiroz"    %% "scala-java-time" % "2.10.0",
+      "org.typelevel"        %% "jawn-parser"     % "1.8.0"
     )
   )
   .settings(
@@ -65,7 +65,7 @@ lazy val diesel = crossProject(JSPlatform, JVMPlatform)
       "-Wunused:imports"
     ),
     libraryDependencies ++= Seq(
-      "org.scalameta" %%% "munit" % "1.1.1" % Test
+      "org.scalameta" %% "munit" % "1.1.1" % Test
     )
   )
   .settings(
@@ -85,7 +85,7 @@ lazy val jsFacade = project
   .settings(copyrightSettings)
   .settings(
     libraryDependencies ++= Seq(
-      "org.scalameta" %%% "munit" % "1.1.1" % Test
+      "org.scalameta" %% "munit" % "1.1.1" % Test
     ),
     // see https://github.com/scalameta/munit/blob/main/junit-interface/src/main/java/munit/internal/junitinterface/JUnitRunner.java
     Test / testOptions += Tests.Argument("+l", "--summary=1")
@@ -94,7 +94,7 @@ lazy val jsFacade = project
 import sbt.Keys.streams
 lazy val copyrightSettingsTS = Seq(
   headerMappings := headerMappings.value + (HeaderFileType("ts") -> HeaderCommentStyle.cStyleBlockComment),
-  Compile / headerSources ++= {
+  Compile / headerSources ++= Def.uncached {
     fileTreeView.value.list(
       Glob(baseDirectory.value.toPath) / "{src,test}" / ** / "*.{ts*,*css}"
     ).map(
