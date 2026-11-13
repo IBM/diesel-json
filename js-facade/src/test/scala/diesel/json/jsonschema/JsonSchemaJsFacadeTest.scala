@@ -91,12 +91,12 @@ class JsonSchemaJsFacadeTest extends FunSuite {
                          |    "required": [ "blah" ]
                          |}""".stripMargin)
     val value  = parse("""{
-                        |    "foo": {
-                        |      "bar": 123,
-                        |      "baz": "yalla"
-                        |    },
-                        |    "blah": true
-                        |}""".stripMargin)
+                         |    "foo": {
+                         |      "bar": 123,
+                         |      "baz": "yalla"
+                         |    },
+                         |    "blah": true
+                         |}""".stripMargin)
     val res    = doValidate(schema, value)
     assert(res.size == 1)
     val err    = res.head

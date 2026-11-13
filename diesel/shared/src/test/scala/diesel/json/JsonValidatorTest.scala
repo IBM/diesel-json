@@ -420,12 +420,12 @@ class JsonValidatorTest extends FunSuite {
                    |    "required": [ "blah" ]
                    |}""".stripMargin
     val value  = """{
-                  |    "foo": {
-                  |      "bar": 123,
-                  |      "baz": "yalla"
-                  |    },
-                  |    "blah": true
-                  |}""".stripMargin
+                   |    "foo": {
+                   |      "bar": 123,
+                   |      "baz": "yalla"
+                   |    },
+                   |    "blah": true
+                   |}""".stripMargin
     assertMarkers(
       Some(schema),
       value,
