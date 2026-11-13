@@ -8,7 +8,7 @@ val scalaVersion_ = "2.13.18"
 lazy val copyrightSettings = Seq(
   startYear        := Some(2018),
   organizationName := "The Diesel Authors",
-  licenses += ("Apache-2.0", url("https://www.apache.org/licenses/LICENSE-2.0.txt"))
+  licenses += ("Apache-2.0", uri("https://www.apache.org/licenses/LICENSE-2.0.txt"))
 )
 
 addCommandAlias("lint", "fmtCheck;fixCheck;headerCheckAll")
@@ -70,9 +70,7 @@ lazy val diesel = crossProject(JSPlatform, JVMPlatform)
   )
   .settings(
     Test / fork        := false,
-    Test / logBuffered := false,
-    // see https://github.com/scalameta/munit/blob/main/junit-interface/src/main/java/munit/internal/junitinterface/JUnitRunner.java
-    Test / testOptions += Tests.Argument("+l", "--summary=1")
+    Test / logBuffered := false
   )
   .settings(
     ThisBuild / semanticdbEnabled := true,
@@ -86,9 +84,7 @@ lazy val jsFacade = project
   .settings(
     libraryDependencies ++= Seq(
       "org.scalameta" %% "munit" % "1.3.6" % Test
-    ),
-    // see https://github.com/scalameta/munit/blob/main/junit-interface/src/main/java/munit/internal/junitinterface/JUnitRunner.java
-    Test / testOptions += Tests.Argument("+l", "--summary=1")
+    )
   )
 
 import sbt.Keys.streams
