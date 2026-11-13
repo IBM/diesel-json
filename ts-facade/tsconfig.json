@@ -6,6 +6,7 @@
     "inlineSourceMap": true,
     "strict": true,
     "module": "commonjs",
+    "rootDir": "src",
     "outDir": "dist",
     "declaration": true,
     "skipLibCheck": true,
