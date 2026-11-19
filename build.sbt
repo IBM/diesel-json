@@ -12,7 +12,7 @@ lazy val copyrightSettings = Seq(
 )
 
 addCommandAlias("lint", "fmtCheck;fixCheck;headerCheckAll")
-addCommandAlias("build", "compile;fastOptJS")
+addCommandAlias("build", "compile;fullOptJS")
 addCommandAlias("fmtCheck", "all scalafmtSbtCheck scalafmtCheckAll")
 addCommandAlias("fixCheck", "scalafixAll --check")
 addCommandAlias("fmt", "all scalafmtSbt scalafmtAll")
