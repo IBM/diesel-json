@@ -15,3 +15,4 @@ metals.sbt
 src_managed/
 
 *gpcreds.json
+build.sbt.semanticdb
