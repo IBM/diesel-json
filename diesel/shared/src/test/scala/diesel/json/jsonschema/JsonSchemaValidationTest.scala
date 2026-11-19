@@ -40,7 +40,7 @@ class JsonSchemaValidationTest extends FunSuite {
 
   test("true") {
     val schema = parseSchema("true")
-    val noErrs = Util.assertNoErrors(schema) _
+    val noErrs = Util.assertNoErrors(schema)
     Seq(
       "{}",
       " \"yalla\"",
@@ -74,7 +74,7 @@ class JsonSchemaValidationTest extends FunSuite {
   }
 
   test("Long") {
-    val noErrs = assertNoErrors(Examples.Long) _
+    val noErrs = assertNoErrors(Examples.Long)
     noErrs("0")
     noErrs("100")
     noErrs("-20")
@@ -88,7 +88,7 @@ class JsonSchemaValidationTest extends FunSuite {
   }
 
   test("String") {
-    val noErrs = assertNoErrors(Examples.String) _
+    val noErrs = assertNoErrors(Examples.String)
     noErrs("\"\"")
     noErrs("\"yalla\"")
     noErrs("null")
@@ -101,8 +101,8 @@ class JsonSchemaValidationTest extends FunSuite {
   }
 
   test("enum array") {
-    val noErrs = assertNoErrors(Examples.EnumArray) _
-    val errs   = assertErrors(Examples.EnumArray) _
+    val noErrs = assertNoErrors(Examples.EnumArray)
+    val errs   = assertErrors(Examples.EnumArray)
 
     noErrs("null")
     noErrs("[]")
@@ -153,8 +153,8 @@ class JsonSchemaValidationTest extends FunSuite {
   }
 
   test("Bean containing other bean") {
-    val noErrs = assertNoErrors(Examples.BeanContainingOtherBean) _
-    val errs   = assertErrors(Examples.BeanContainingOtherBean) _
+    val noErrs = assertNoErrors(Examples.BeanContainingOtherBean)
+    val errs   = assertErrors(Examples.BeanContainingOtherBean)
 
     noErrs(
       """{
@@ -189,8 +189,8 @@ class JsonSchemaValidationTest extends FunSuite {
   }
 
   test("Cycle") {
-    val noErrs = assertNoErrors(Examples.Cycle) _
-    val errs   = assertErrors(Examples.Cycle) _
+    val noErrs = assertNoErrors(Examples.Cycle)
+    val errs   = assertErrors(Examples.Cycle)
 
     noErrs("""{}""")
     noErrs("""{ "next": {} }""")
@@ -207,8 +207,8 @@ class JsonSchemaValidationTest extends FunSuite {
   }
 
   test("Inheritance") {
-    val noErrs = assertNoErrors(Examples.Inheritance) _
-    val errs   = assertErrors(Examples.Inheritance) _
+    val noErrs = assertNoErrors(Examples.Inheritance)
+    val errs   = assertErrors(Examples.Inheritance)
 
     noErrs("{}")
     noErrs("""{ "height": 1 }""")
@@ -254,8 +254,8 @@ class JsonSchemaValidationTest extends FunSuite {
         |  }
         |}""".stripMargin
 
-    val noErrs = assertNoErrors(schema) _
-    val errs   = assertErrors(schema) _
+    val noErrs = assertNoErrors(schema)
+    val errs   = assertErrors(schema)
     noErrs("""{ "what": "funk", "groove": "yeah" }""")
     noErrs("""{ "what": "blues", "soul": "indeed" }""")
     noErrs("""{ "what": "musette", "soul": "nah" }""")
@@ -265,8 +265,8 @@ class JsonSchemaValidationTest extends FunSuite {
   }
 
   test("Polymorphism") {
-    val noErrs = assertNoErrors(Examples.Polymorphism) _
-    val errs   = assertErrors(Examples.Polymorphism) _
+    val noErrs = assertNoErrors(Examples.Polymorphism)
+    val errs   = assertErrors(Examples.Polymorphism)
 
     noErrs("{}")
     noErrs(
@@ -333,12 +333,12 @@ class JsonSchemaValidationTest extends FunSuite {
         |    }
         |  }
         |}""".stripMargin
-    val noErrs = assertNoErrors(schema) _
+    val noErrs = assertNoErrors(schema)
 
     noErrs("{}")
     noErrs("""{ "bb": "yalla" }""")
 
-    val errs = assertErrors(schema) _
+    val errs = assertErrors(schema)
     errs("""{ "bb": 123 }""", List(InvalidTypeError(JPath(List("bb")), "string")))
   }
 
@@ -368,14 +368,14 @@ class JsonSchemaValidationTest extends FunSuite {
         |    }
         |  }
         |}""".stripMargin
-    val noErrs = assertNoErrors(schema) _
+    val noErrs = assertNoErrors(schema)
 
     noErrs("{}")
     noErrs("""{ "aa": "yallaA" }""")
     noErrs("""{ "bb": "yallaB" }""")
     noErrs("""{ "aa": "yallaA", "bb": "yallaB" }""")
 
-    val errs = assertErrors(schema) _
+    val errs = assertErrors(schema)
     errs("""{ "aa": "yallaA", "bb": 123 }""", List(InvalidTypeError(JPath(List("bb")), "string")))
     errs("""{ "aa": 123, "bb": "yallaB" }""", List(InvalidTypeError(JPath(List("aa")), "string")))
     errs(
@@ -397,7 +397,7 @@ class JsonSchemaValidationTest extends FunSuite {
         |    "parent": { "$dynamicRef": "#yalla" }
         |  }
         |}""".stripMargin
-    val errs   = assertErrors(schema) _
+    val errs   = assertErrors(schema)
     errs("""{ "parent": 123 }""", List(InvalidTypeError("/parent", "object")))
   }
 
@@ -408,7 +408,7 @@ class JsonSchemaValidationTest extends FunSuite {
         |    "type": "string"
         |  }
         |}""".stripMargin
-    val errs   = assertErrors(schema) _
+    val errs   = assertErrors(schema)
     errs("""{ "x": 123, "y": "yeah" }""", List(InvalidTypeError("/x", "string")))
   }
 
@@ -420,7 +420,7 @@ class JsonSchemaValidationTest extends FunSuite {
         |  },
         |  "additionalProperties": false
         |}""".stripMargin
-    val errs   = assertErrors(schema) _
+    val errs   = assertErrors(schema)
     errs("""{ "foo": "bar", "yalla": true }""", List(NothingValidatesError("/yalla")))
   }
 
@@ -432,12 +432,12 @@ class JsonSchemaValidationTest extends FunSuite {
                    |    "^I_": { "type": "integer" }
                    |  }
                    |}""".stripMargin
-    val noErrs = assertNoErrors(schema) _
+    val noErrs = assertNoErrors(schema)
     noErrs("""{ "S_25": "This is a string" }""")
     noErrs("""{ "I_0": 42 }""")
     noErrs("""{ }""")
     noErrs("""{ "foo": 123 }""")
-    val errs   = assertErrors(schema) _
+    val errs   = assertErrors(schema)
     errs("""{ "S_nake": true }""", Seq(InvalidTypeError("/S_nake", "string")))
   }
 
@@ -467,10 +467,10 @@ class JsonSchemaValidationTest extends FunSuite {
 
   test("self-validate defs") {
     val schema = JsonSchemaSpec.schema
-    val noErrs = Util.assertNoErrors(schema) _
+    val noErrs = Util.assertNoErrors(schema)
     noErrs("{}")
     noErrs("""{ "foo": "bar" }""")
-    val errs   = Util.assertErrors(schema) _
+    val errs   = Util.assertErrors(schema)
     errs("""{ "definitions": 123 }""") { (_, es) =>
       assert(es == List(InvalidTypeError("/definitions", "object")))
     }
@@ -478,7 +478,7 @@ class JsonSchemaValidationTest extends FunSuite {
 
   test("self-validate allOf") {
     val schema = JsonSchemaSpec.schema
-    val errs   = Util.assertErrors(schema) _
+    val errs   = Util.assertErrors(schema)
     errs("""{ "allOf": 1 }""") { (_, es) =>
       assert(es == List(InvalidTypeError("/allOf", "array")))
     }

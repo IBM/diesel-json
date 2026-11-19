@@ -10,13 +10,13 @@ scalacOptions ++= Seq(
   "-unchecked",
   "-deprecation",
   "-feature",
-  "-Xfatal-warnings",
   "-language:existentials",
-  "-Wunused:imports"
+  "-Wunused:imports",
+  "-Werror"
 )
 
-Compile / fastOptJS := Def.uncached {
-  val file = (Compile / fastOptJS).value
+Compile / fullOptJS := Def.uncached {
+  val file = (Compile / fullOptJS).value
   IO.copyFile(file.data, baseDirectory.value / "dist" / "json-schema-facade.js")
   file
 }

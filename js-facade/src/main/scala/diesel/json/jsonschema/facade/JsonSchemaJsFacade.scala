@@ -81,7 +81,7 @@ object JsonSchemaJsFacade {
   @JSExport
   def getErrors(res: JsValidationResult): js.Array[JsValidationError] = {
     val jsErrs = res.res.getErrors.map(toJsError)
-    js.Array(jsErrs: _*)
+    js.Array(jsErrs *)
   }
 
   @JSExport
@@ -111,7 +111,7 @@ object JsonSchemaJsFacade {
     val v: JsonValue              = validationResult.value
     val proposals: Seq[JsonValue] =
       JsonSchema.propose(validationResult.res, v.astValue, parsedPath, maxDepth).map(av => JsonValue(av))
-    val res                       = js.Array(proposals: _*)
+    val res                       = js.Array(proposals *)
     res
   }
 
@@ -134,7 +134,7 @@ object JsonSchemaJsFacade {
           Seq.empty
       }
     val names                                     = filtered.map(_.name)
-    js.Array(names: _*)
+    js.Array(names *)
   }
 
   @JSExport
