@@ -63,7 +63,7 @@ lazy val diesel = crossProject(JSPlatform, JVMPlatform)
       "-language:existentials",
       "-Wunused:imports",
       "-rewrite",
-      "-source:3.6-migration"
+      "-source:3.7-migration"
     ),
     libraryDependencies ++= Seq(
       "org.scalameta" %% "munit" % "1.3.6" % Test

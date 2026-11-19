@@ -98,7 +98,7 @@ object JsonParser {
   case class JPRError(message: String)    extends JsonParseResult
   case class JPRSuccess(value: Ast.Value) extends JsonParseResult
 
-  def parse(text: String): JsonParseResult = jawn.Parser.parseFromString(text)(Facade) match {
+  def parse(text: String): JsonParseResult = jawn.Parser.parseFromString(text)(using Facade) match {
     case Failure(exception) =>
       JPRError(exception.getMessage())
     case Success(value)     =>
