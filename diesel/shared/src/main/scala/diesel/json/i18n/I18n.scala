@@ -37,7 +37,7 @@ object I18n extends Messages {
   val notFailed                                            = msg0
   val invalidStringFormat: Msg1[String]                    = msg1[String]
 
-  private def pipedToString[T] = { arg: Seq[T] => arg.mkString(" | ") }
+  private def pipedToString[T] = { (arg: Seq[T]) => arg.mkString(" | ") }
 
   override protected def load(): Map[Messages.Lang, Map[String, MessageFormat]] =
     I18nFiles.messages.flatMap { case (k, v) =>

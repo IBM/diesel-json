@@ -3,7 +3,7 @@ import sbtcrossproject.CrossPlugin.autoImport.crossProject
 
 import scala.sys.process._
 
-val scalaVersion_ = "2.13.18"
+val scalaVersion_ = "3.9.0"
 
 lazy val copyrightSettings = Seq(
   startYear        := Some(2018),
@@ -60,9 +60,10 @@ lazy val diesel = crossProject(JSPlatform, JVMPlatform)
       "-unchecked",
       "-deprecation",
       "-feature",
-      "-Xfatal-warnings",
       "-language:existentials",
-      "-Wunused:imports"
+      "-Wunused:imports",
+      "-rewrite",
+      "-source:3.6-migration"
     ),
     libraryDependencies ++= Seq(
       "org.scalameta" %% "munit" % "1.3.6" % Test

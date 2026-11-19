@@ -10,9 +10,10 @@ scalacOptions ++= Seq(
   "-unchecked",
   "-deprecation",
   "-feature",
-  "-Xfatal-warnings",
   "-language:existentials",
-  "-Wunused:imports"
+  "-Wunused:imports",
+  "-rewrite",
+  "-source:3.6-migration"
 )
 
 Compile / fastOptJS := Def.uncached {
