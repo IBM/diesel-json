@@ -3,7 +3,7 @@ import sbtcrossproject.CrossPlugin.autoImport.crossProject
 
 import scala.sys.process._
 
-val scalaVersion_ = "3.9.0"
+val scalaVersion_ = "3.10.1"
 
 lazy val copyrightSettings = Seq(
   startYear        := Some(2018),
