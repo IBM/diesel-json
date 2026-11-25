@@ -2,10 +2,10 @@
 # yarn lockfile v1
 
 
-"@diesel-parser/ts-facade@~0.32.0":
-  version "0.32.2"
-  resolved "https://registry.npmjs.org/@diesel-parser/ts-facade/-/ts-facade-0.32.2.tgz"
-  integrity sha512-0/h/8Uzfxx0Ab536TvM+LtlhaOzwYMCACIBL9061cBUI9q/dbKFUguwZuHr+eoBtOTjrXxiMzs11rATeEN1XZQ==
+"@diesel-parser/ts-facade@~1.0.0":
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/@diesel-parser/ts-facade/-/ts-facade-1.0.0.tgz#2169a65f866f9c962c8bed00666545e30de246dc"
+  integrity sha512-Zsd1ChAgvTI87wDzREluNtw3sw3ksoClUMdnFUhCWe6QHlLYQaa/kyUnmRC1pwRAMApAfzXK7mmDPTgkfmQ56A==
 
 "@dual-bundle/import-meta-resolve@^4.2.1":
   version "4.2.1"

@@ -18,7 +18,7 @@
     "rimraf": "^6.1.3"
   },
   "devDependencies": {
-    "@diesel-parser/ts-facade": "~0.32.0",
+    "@diesel-parser/ts-facade": "~1.0.0",
     "eslint-config-prettier": "^10.0.0",
     "eslint-plugin-prettier": "^5.0.0",
     "prettier": "3.10.1",
